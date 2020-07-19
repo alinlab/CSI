@@ -14,11 +14,11 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
           simclr_aug=None, linear=None, linear_optim=None):
 
     if P.multi_gpu:
-        rotation_linear = model.module.rotation_layer
-        joint_linear = model.module.joint_layer
+        rotation_linear = model.module.shift_cls_layer
+        joint_linear = model.module.joint_distribution_layer
     else:
-        rotation_linear = model.rotation_layer
-        joint_linear = model.joint_layer
+        rotation_linear = model.shift_cls_layer
+        joint_linear = model.joint_distribution_layer
 
     if epoch == 1:
         # define optimizer and save in P (argument)

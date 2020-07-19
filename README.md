@@ -43,7 +43,10 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
 To train labeled multi-class model (confidence calibrated classifier) in the paper, run this command:
 
 ```train
+# Representation train
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 train.py --dataset <DATASET> --model <NETWORK> --mode sup_simclr_CSI --shift_trans_type rotation --batch_size 32 --epoch 700
+# Linear layer train
+python train.py --mode sup_linear --dataset <DATASET> --model <NETWORK> --batch_size 32 --epoch 100 --shift_trans_type rotation --load_path <MODEL_PATH>
 ```
 
 > To run SupCLR simply change --mode to sup_simclr. Total batch size should be same as above. Currently only supports rotation for shifted transformation.
@@ -51,7 +54,9 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node
 ## 3. Evaluation
 
 We provide the checkpoint of the CSI pre-trained model. Download the checkpoint from the following link:
-- [Unlabeled CIFAR-10 multi-class](https://drive.google.com/file/d/1UovIU023QajfdCgUcs21_5NeCQpSg-dB/view?usp=sharing) (ResNet-18) 
+- Unlabeled CIFAR-10 multi-class: [ResNet-18](https://drive.google.com/file/d/1UovIU023QajfdCgUcs21_5NeCQpSg-dB/view?usp=sharing)
+- Unlabeled ImageNet-30 multi-class: [ResNet-18](https://drive.google.com/file/d/1TQVlDmagx7MgKahDtyPg7X79O7poz9ma/view?usp=sharing)
+- Labeled CIFAR-10 multi-class: [ResNet-18](https://drive.google.com/file/d/1j0fNkGRL_8-Sv5lmUgASyc5pqW8q4bhD/view?usp=sharing)
 
 We will update other checkpoints in the future.
 
