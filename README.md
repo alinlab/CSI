@@ -1,6 +1,6 @@
 # CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances
 
-This repository is the official PyTorch implementation of ["**CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances**"](https://arxiv.org/abs/2007.08176)
+This repository is the official PyTorch implementation of ["**CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances**"](https://arxiv.org/abs/2007.08176) by Jihoon Tack*, [Sangwoo Mo](https://sites.google.com/view/sangwoomo)*, [Jongheon Jeong](https://sites.google.com/view/jongheonj) and [Jinwoo Shin](http://alinlab.kaist.ac.kr/shin.html).
 
 ## 1. Requirements
 ### Environments
