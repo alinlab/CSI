@@ -125,36 +125,13 @@ def load_checkpoint(logdir, mode='last'):
     return model_state, optim_state, cfg
 
 
-def save_checkpoint(epoch, best, model_state, optim_state, logdir, is_best):
+def save_checkpoint(epoch, model_state, optim_state, logdir):
     last_model = os.path.join(logdir, 'last.model')
-    best_model = os.path.join(logdir, 'best.model')
     last_optim = os.path.join(logdir, 'last.optim')
-    best_optim = os.path.join(logdir, 'best.optim')
     last_config = os.path.join(logdir, 'last.config')
-    best_config = os.path.join(logdir, 'best.config')
 
     opt = {
         'epoch': epoch,
-        'best': best
-    }
-    torch.save(model_state, last_model)
-    torch.save(optim_state, last_optim)
-    with open(last_config, 'wb') as handle:
-        pickle.dump(opt, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    if is_best:
-        shutil.copyfile(last_model, best_model)
-        shutil.copyfile(last_optim, best_optim)
-        shutil.copyfile(last_config, best_config)
-
-
-def save_checkpoint_epoch(epoch, model_state, optim_state, logdir):
-    last_model = os.path.join(logdir, f'epoch{epoch}.model')
-    last_optim = os.path.join(logdir, f'epoch{epoch}.optim')
-    last_config = os.path.join(logdir, f'epoch{epoch}.config')
-
-    opt = {
-        'epoch': epoch,
-        'best': None
     }
     torch.save(model_state, last_model)
     torch.save(optim_state, last_optim)
@@ -178,13 +155,9 @@ def load_linear_checkpoint(logdir, mode='last'):
         return None
 
 
-def save_linear_checkpoint(linear_optim_state, logdir, is_best):
+def save_linear_checkpoint(linear_optim_state, logdir):
     last_linear_optim = os.path.join(logdir, 'last.linear_optim')
-    best_linear_optim = os.path.join(logdir, 'best.linear_optim')
     torch.save(linear_optim_state, last_linear_optim)
-
-    if is_best:
-        shutil.copyfile(last_linear_optim, best_linear_optim)
 
 
 def set_random_seed(seed):

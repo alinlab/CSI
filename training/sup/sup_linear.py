@@ -100,9 +100,7 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         loss_joint.backward()
         P.joint_linear_optim.step()
 
-        ### optimizer learning rate scheduler ###
-        P.linear_scheduler.step(epoch - 1 + n / len(loader))
-        P.rot_scheduler.step(epoch - 1 + n / len(loader))
+        ### optimizer learning rate ###
         lr = P.linear_optim.param_groups[0]['lr']
 
         batch_time.update(time.time() - check)
@@ -117,6 +115,11 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
                  (epoch, count, batch_time.value, data_time.value, lr,
                   losses['cls'].value, losses['rot'].value))
         check = time.time()
+
+    ### optimizer learning rate scheduler ###
+    P.linear_scheduler.step()
+    P.rot_scheduler.step()
+    P.joint_scheduler.step()
 
     log_('[DONE] [Time %.3f] [Data %.3f] [LossC %f] [LossR %f]' %
          (batch_time.average, data_time.average,
