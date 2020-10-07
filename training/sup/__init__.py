@@ -3,6 +3,8 @@ def setup(mode, P):
 
     if mode == 'sup_linear':
         from .sup_linear import train
+    elif mode == 'sup_CSI_linear':
+        from .sup_CSI_linear import train
     elif mode == 'sup_simclr':
         from .sup_simclr import train
     elif mode == 'sup_simclr_CSI':

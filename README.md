@@ -1,6 +1,10 @@
 # CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances
 
-This repository is the official PyTorch implementation of ["**CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances**"](https://arxiv.org/abs/2007.08176) by Jihoon Tack*, [Sangwoo Mo](https://sites.google.com/view/sangwoomo)*, [Jongheon Jeong](https://sites.google.com/view/jongheonj) and [Jinwoo Shin](http://alinlab.kaist.ac.kr/shin.html).
+Official PyTorch implementation of ["**CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances**"](https://arxiv.org/abs/2007.08176) (NeurIPS 2020) by [Jihoon Tack*](https://jihoon-tack.github.io), [Sangwoo Mo*](https://sites.google.com/view/sangwoomo), [Jongheon Jeong](https://sites.google.com/view/jongheonj), and [Jinwoo Shin](http://alinlab.kaist.ac.kr/shin.html).
+
+<p align="center">
+    <img src=./datasets/figure.png width="900"> 
+</p>
 
 ## 1. Requirements
 ### Environments
@@ -46,10 +50,10 @@ To train labeled multi-class model (confidence calibrated classifier) in the pap
 # Representation train
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 train.py --dataset <DATASET> --model <NETWORK> --mode sup_simclr_CSI --shift_trans_type rotation --batch_size 32 --epoch 700
 # Linear layer train
-python train.py --mode sup_linear --dataset <DATASET> --model <NETWORK> --batch_size 32 --epoch 100 --shift_trans_type rotation --load_path <MODEL_PATH>
+python train.py --mode sup_CSI_linear --dataset <DATASET> --model <NETWORK> --batch_size 32 --epoch 100 --shift_trans_type rotation --load_path <MODEL_PATH>
 ```
 
-> To run SupCLR simply change --mode to sup_simclr. Total batch size should be same as above. Currently only supports rotation for shifted transformation.
+> To run SupCLR simply change --mode to sup_simclr, sup_linear for representation training and linear layer training respectively. Total batch size should be same as above. Currently only supports rotation for shifted transformation.
 
 ## 3. Evaluation
 
@@ -135,3 +139,12 @@ python imagenet_fix_preprocess.py
 python lsun_fix_preprocess.py
 ```
 
+## Citation
+```
+@inproceedings{tack2020csi,
+  title={CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances},
+  author={Jihoon Tack and Sangwoo Mo and Jongheon Jeong and Jinwoo Shin},
+  booktitle={Advances in Neural Information Processing Systems},
+  year={2020}
+}
+```
