@@ -104,9 +104,6 @@ criterion = nn.CrossEntropyLoss().to(device)
 if P.optimizer == 'sgd':
     optimizer = optim.SGD(model.parameters(), lr=P.lr_init, momentum=0.9, weight_decay=P.weight_decay)
     lr_decay_gamma = 0.1
-elif P.optimizer == 'adam':
-    optimizer = optim.Adam(model.parameters(), lr=P.lr_init, betas=(.9, .999), weight_decay=P.weight_decay)
-    lr_decay_gamma = 0.3
 elif P.optimizer == 'lars':
     from torchlars import LARS
     base_optimizer = optim.SGD(model.parameters(), lr=P.lr_init, momentum=0.9, weight_decay=P.weight_decay)

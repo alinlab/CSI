@@ -39,7 +39,7 @@ def parse_args(default=False):
     parser.add_argument('--epochs', help='Epochs',
                         default=1000, type=int)
     parser.add_argument('--optimizer', help='Optimizer',
-                        choices=['sgd', 'adam', 'lars'],
+                        choices=['sgd', 'lars'],
                         default='lars', type=str)
     parser.add_argument('--lr_scheduler', help='Learning rate scheduler',
                         choices=['step_decay', 'cosine'],
