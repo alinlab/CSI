@@ -3,7 +3,7 @@
 Official PyTorch implementation of
 ["**CSI: Novelty Detection via Contrastive Learning on Distributionally Shifted Instances**"](
 https://arxiv.org/abs/2007.08176) (NeurIPS 2020) by
-[Jihoon Tack*](https://jihoon-tack.github.io),
+[Jihoon Tack*](https://jihoontack.github.io),
 [Sangwoo Mo*](https://sites.google.com/view/sangwoomo),
 [Jongheon Jeong](https://sites.google.com/view/jongheonj),
 and [Jinwoo Shin](http://alinlab.kaist.ac.kr/shin.html).
