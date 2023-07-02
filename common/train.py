@@ -40,7 +40,7 @@ else:
 P.ood_layer = P.ood_layer[0]
 
 ### Initialize dataset ###
-train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset)
+train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True)
 P.image_size = image_size
 P.n_classes = n_classes
 
@@ -82,7 +82,7 @@ for ood in P.ood_dataset:
         ood_test_set = get_subclass_dataset(full_test_set, classes=cls_list[ood])
         ood = f'one_class_{ood}'  # change save name
     else:
-        ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size)
+        ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, download=True)
 
     if P.multi_gpu:
         ood_sampler = DistributedSampler(ood_test_set, num_replicas=P.n_gpus, rank=P.local_rank)

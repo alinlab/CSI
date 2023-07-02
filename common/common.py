@@ -7,11 +7,11 @@ def parse_args(default=False):
     parser = ArgumentParser(description='Pytorch implementation of CSI')
 
     parser.add_argument('--dataset', help='Dataset',
-                        choices=['cifar10', 'cifar100', 'imagenet'], type=str)
+                        choices=['cifar10', 'cifar100', 'imagenet'], default="cifar10", type=str)
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
     parser.add_argument('--model', help='Model',
-                        choices=['resnet18', 'resnet18_imagenet'], type=str)
+                        choices=['resnet18', 'resnet18_imagenet'], default="resnet18", type=str)
     parser.add_argument('--mode', help='Training mode',
                         default='simclr', type=str)
     parser.add_argument('--simclr_dim', help='Dimension of simclr layer',

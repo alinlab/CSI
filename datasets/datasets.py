@@ -7,8 +7,8 @@ from torchvision import datasets, transforms
 
 from utils.utils import set_random_seed
 
-DATA_PATH = '~/data/'
-IMAGENET_PATH = '~/data/ImageNet'
+DATA_PATH = './data/'
+IMAGENET_PATH = './data/ImageNet'
 
 
 CIFAR10_SUPERCLASS = list(range(10))  # one class
@@ -154,7 +154,7 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         test_dir = os.path.join(DATA_PATH, 'LSUN_resize')
         test_set = datasets.ImageFolder(test_dir, transform=test_transform)
 
-    elif dataset == 'lsun_fix':
+    elif dataset == 'lsun_pil':
         assert test_only and image_size is not None
         test_dir = os.path.join(DATA_PATH, 'LSUN_fix')
         test_set = datasets.ImageFolder(test_dir, transform=test_transform)
@@ -164,7 +164,7 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         test_dir = os.path.join(DATA_PATH, 'Imagenet_resize')
         test_set = datasets.ImageFolder(test_dir, transform=test_transform)
 
-    elif dataset == 'imagenet_fix':
+    elif dataset == 'imagenet_pil':
         assert test_only and image_size is not None
         test_dir = os.path.join(DATA_PATH, 'Imagenet_fix')
         test_set = datasets.ImageFolder(test_dir, transform=test_transform)
