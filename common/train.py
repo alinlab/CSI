@@ -43,7 +43,6 @@ P.ood_layer = P.ood_layer[0]
 train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True)
 P.image_size = image_size
 P.n_classes = n_classes
-print("111111: ", len(train_set))
 main_count = 5000
 if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
@@ -51,7 +50,6 @@ if P.one_class_idx is not None:
     full_test_set = deepcopy(test_set)  # test set of full classes
     train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=main_count)
     test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
-    print("222222: ", len(train_set))
 
 kwargs = {'pin_memory': False, 'num_workers': 4}
 
@@ -63,7 +61,7 @@ if P.multi_gpu:
 else:
     train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
     test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
-print("333333333", len(train_loader), len(train_set))
+
 if P.ood_dataset is None:
     if P.one_class_idx is not None:
         P.ood_dataset = list(range(P.n_superclasses))
