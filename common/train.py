@@ -44,12 +44,12 @@ train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, d
 P.image_size = image_size
 P.n_classes = n_classes
 
+main_count = 10000
 if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
-
     full_test_set = deepcopy(test_set)  # test set of full classes
-    train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx])
+    train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=main_count)
     test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
 
 kwargs = {'pin_memory': False, 'num_workers': 4}
@@ -90,7 +90,7 @@ for ood in P.ood_dataset:
     else:
         ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
-train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size)
+train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size, count=main_count)
 
 ### Initialize model ###
 

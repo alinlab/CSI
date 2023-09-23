@@ -130,8 +130,11 @@ class ImageNetExposure(Dataset):
     def __init__(self, root, count, transform=None):
         self.transform = transform
         image_files = glob(os.path.join(root, 'train', "*", "images", "*.JPEG"))
-        random.shuffle(image_files)
-        final_length = min(len(image_files), count)
+        if count==-1:
+            final_length = len(image_files)
+        else:
+            random.shuffle(image_files)
+            final_length = min(len(image_files), count)
         self.image_files = image_files[:final_length]
         self.image_files.sort(key=lambda y: y.lower())
 
@@ -148,15 +151,14 @@ class ImageNetExposure(Dataset):
 
 
 def get_exposure_dataloader(batch_size = 64, image_size = (32, 32),
-                            base_path = './tiny-imagenet-200'):
+                            base_path = './tiny-imagenet-200', count=-1):
     
-    tiny_imgnet_count = 5000
     tiny_transform = transforms.Compose([
             transforms.Resize((image_size[0], image_size[1])),
             transforms.AutoAugment(),
             transforms.ToTensor()
     ])
-    imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_imgnet_count, transform=tiny_transform)
+    imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
     train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
     return train_loader
 
@@ -283,7 +285,7 @@ def get_superclass_list(dataset):
         raise NotImplementedError()
 
 
-def get_subclass_dataset(dataset, classes):
+def get_subclass_dataset(dataset, classes, count=-1):
     if not isinstance(classes, list):
         classes = [classes]
 
@@ -293,6 +295,18 @@ def get_subclass_dataset(dataset, classes):
             indices.append(idx)
 
     dataset = Subset(dataset, indices)
+    if count==-1:
+        pass
+    elif len(trainset)>count:
+        dataset = Subset(dataset, [i for i in range(count)])
+    else:
+        num = int(count / len(dataset))
+        remainding = (count - num*len(dataset))
+        trnsets = [dataset for i in range(num)]
+        dataset = Subset(dataset, [i for i in range(remainding)])
+        trnsets = trnsets + [dataset]
+        dataset = torch.utils.data.ConcatDataset(trnsets)
+
     return dataset
 
 
