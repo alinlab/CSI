@@ -297,7 +297,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
     dataset = Subset(dataset, indices)
     if count==-1:
         pass
-    elif len(trainset)>count:
+    elif len(dataset)>count:
         dataset = Subset(dataset, [i for i in range(count)])
     else:
         num = int(count / len(dataset))
