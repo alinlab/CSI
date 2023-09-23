@@ -72,6 +72,7 @@ simclr_aug = C.get_simclr_augmentation(P, image_size=P.image_size).to(device)
 P.shift_trans, P.K_shift = C.get_shift_module(P, eval=True)
 P.shift_trans = P.shift_trans.to(device)
 
+P.K_shift = 2
 model = C.get_classifier(P.model, n_classes=P.n_classes).to(device)
 model = C.get_shift_classifer(model, P.K_shift).to(device)
 criterion = nn.CrossEntropyLoss().to(device)

@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 from common.common import parse_args
 import models.classifier as C
-from datasets import get_dataset, get_superclass_list, get_subclass_dataset
+from datasets import get_dataset, get_superclass_list, get_subclass_dataset, get_exposure_dataloader
 from utils.utils import load_checkpoint
 
 P = parse_args()
@@ -90,12 +90,15 @@ for ood in P.ood_dataset:
     else:
         ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
+train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size)
+
 ### Initialize model ###
 
 simclr_aug = C.get_simclr_augmentation(P, image_size=P.image_size).to(device)
 P.shift_trans, P.K_shift = C.get_shift_module(P, eval=True)
 P.shift_trans = P.shift_trans.to(device)
 
+P.K_shift = 2
 model = C.get_classifier(P.model, n_classes=P.n_classes).to(device)
 model = C.get_shift_classifer(model, P.K_shift).to(device)
 

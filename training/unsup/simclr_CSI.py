@@ -10,7 +10,7 @@ device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
 hflip = TL.HorizontalFlipLayer().to(device)
 
 
-def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
+def train(P, epoch, model, criterion, optimizer, scheduler, loader, train_exposure_loader=None, logger=None,
           simclr_aug=None, linear=None, linear_optim=None):
 
     assert simclr_aug is not None
@@ -31,7 +31,14 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
     losses['shift'] = AverageMeter()
 
     check = time.time()
+    train_exposure_loader_iterator = iter(train_exposure_loader)
     for n, (images, labels) in enumerate(loader):
+        try:
+            exposure_images = next(train_exposure_loader_iterator)
+        except StopIteration:
+            train_exposure_loader_iterator = iter(train_exposure_loader)
+            exposure_images = next(train_exposure_loader_iterator)
+
         model.train()
         count = n * P.n_gpus  # number of trained samples
 
@@ -42,17 +49,22 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         if P.dataset != 'imagenet':
             batch_size = images.size(0)
             images = images.to(device)
+            exposure_images = exposure_images.to(device)
             images1, images2 = hflip(images.repeat(2, 1, 1, 1)).chunk(2)  # hflip
+            exposure_images1, exposure_images2 = hflip(exposure_images.repeat(2, 1, 1, 1)).chunk(2)  # hflip
         else:
             batch_size = images[0].size(0)
             images1, images2 = images[0].to(device), images[1].to(device)
         labels = labels.to(device)
-
-        images1 = torch.cat([P.shift_trans(images1, k) for k in range(P.K_shift)])
-        images2 = torch.cat([P.shift_trans(images2, k) for k in range(P.K_shift)])
-        shift_labels = torch.cat([torch.ones_like(labels) * k for k in range(P.K_shift)], 0)  # B -> 4B
+        
+        images1 = torch.cat([images1, exposure_images1])
+        images2 = torch.cat([images2, exposure_images2])
+        #images1 = torch.cat([P.shift_trans(images1, k) for k in range(P.K_shift)])
+        #images2 = torch.cat([P.shift_trans(images2, k) for k in range(P.K_shift)])
+        #shift_labels = torch.cat([torch.ones_like(labels) * k for k in range(P.K_shift)], 0)  # B -> 4B
+        shift_labels = torch.cat([torch.ones_like(labels), torch.zeros_like(labels)], 0)  # B -> 4B
         shift_labels = shift_labels.repeat(2)
-
+        
         images_pair = torch.cat([images1, images2], dim=0)  # 8B
         images_pair = simclr_aug(images_pair)  # transform
 
@@ -75,21 +87,6 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         lr = optimizer.param_groups[0]['lr']
 
         batch_time.update(time.time() - check)
-
-        ### Post-processing stuffs ###
-        simclr_norm = outputs_aux['simclr'].norm(dim=1).mean()
-
-        penul_1 = outputs_aux['penultimate'][:batch_size]
-        penul_2 = outputs_aux['penultimate'][P.K_shift * batch_size: (P.K_shift + 1) * batch_size]
-        outputs_aux['penultimate'] = torch.cat([penul_1, penul_2])  # only use original rotation
-
-        ### Linear evaluation ###
-        outputs_linear_eval = linear(outputs_aux['penultimate'].detach())
-        loss_linear = criterion(outputs_linear_eval, labels.repeat(2))
-
-        linear_optim.zero_grad()
-        loss_linear.backward()
-        linear_optim.step()
 
         losses['cls'].update(0, batch_size)
         losses['sim'].update(loss_sim.item(), batch_size)

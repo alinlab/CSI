@@ -4,8 +4,13 @@ import numpy as np
 import torch
 from torch.utils.data.dataset import Subset
 from torchvision import datasets, transforms
+from torch.utils.data import DataLoader, Dataset
 
 from utils.utils import set_random_seed
+
+from PIL import Image
+from glob import glob
+import random
 
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
@@ -121,6 +126,39 @@ def get_transform_imagenet():
 
     return train_transform, test_transform
 
+class ImageNetExposure(Dataset):
+    def __init__(self, root, count, transform=None):
+        self.transform = transform
+        image_files = glob(os.path.join(root, 'train', "*", "images", "*.JPEG"))
+        random.shuffle(image_files)
+        final_length = min(len(image_files), count)
+        self.image_files = image_files[:final_length]
+        self.image_files.sort(key=lambda y: y.lower())
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        return image
+
+    def __len__(self):
+        return len(self.image_files)
+
+
+def get_exposure_dataloader(batch_size = 64, image_size = (32, 32),
+                            base_path = './tiny-imagenet-200'):
+    
+    tiny_imgnet_count = 5000
+    tiny_transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.AutoAugment(),
+            transforms.ToTensor()
+    ])
+    imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_imgnet_count, transform=tiny_transform)
+    train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
+    return train_loader
 
 def get_dataset(P, dataset, test_only=False, image_size=None, download=False, eval=False):
     if dataset in ['imagenet', 'cub', 'stanford_dogs', 'flowers102',
