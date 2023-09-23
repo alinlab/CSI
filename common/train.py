@@ -68,7 +68,7 @@ if P.ood_dataset is None:
         P.ood_dataset = list(range(P.n_superclasses))
         P.ood_dataset.pop(P.one_class_idx)
     elif P.dataset == 'cifar10':
-        P.ood_dataset = ['svhn', 'lsun_resize', 'imagenet_resize', 'lsun_fix', 'imagenet_fix', 'cifar100', 'interp']
+            P.ood_dataset = ['svhn', 'cifar100', 'mnist', 'imagenet', "fashion-mnist"]
     elif P.dataset == 'imagenet':
         P.ood_dataset = ['cub', 'stanford_dogs', 'flowers102']
 

@@ -18,6 +18,9 @@ IMAGENET_PATH = './data/ImageNet'
 
 CIFAR10_SUPERCLASS = list(range(10))  # one class
 IMAGENET_SUPERCLASS = list(range(30))  # one class
+MNIST_SUPERCLASS = list(range(10))
+SVHN_SUPERCLASS = list(range(10))
+FashionMNIST_SUPERCLASS = list(range(10))
 
 CIFAR100_SUPERCLASS = [
     [4, 31, 55, 72, 95],
@@ -179,11 +182,44 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
 
+    elif dataset == 'fashion-mnist':
+        image_size = (32, 32, 3)
+        n_classes = 10
+        train_transform = transforms.Compose([
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+        ])
+        test_transform = transforms.Compose([
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+        ])
+        train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
+        test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
+    
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
         n_classes = 100
         train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR100(DATA_PATH, train=False, download=download, transform=test_transform)
+    
+    elif dataset == 'mnist':
+        train_transform = transforms.Compose([
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+        ])
+        test_transform = transforms.Compose([
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+        ])
+        image_size = (32, 32, 1)
+        n_classes = 10
+        train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
+        test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
+    elif dataset == 'svhn-10':
+        image_size = (32, 32, 3)
+        n_classes = 10
+        train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=test_transform)
+        test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=test_transform)
 
     elif dataset == 'svhn':
         assert test_only and image_size is not None
@@ -275,8 +311,14 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
 
 
 def get_superclass_list(dataset):
+    if dataset == 'svhn-10':
+        return SVHN_SUPERCLASS
     if dataset == 'cifar10':
         return CIFAR10_SUPERCLASS
+    if dataset == 'fashion-mnist':
+        return FashionMNIST_SUPERCLASS
+    elif dataset == 'mnist':
+        return MNIST_SUPERCLASS
     elif dataset == 'cifar100':
         return CIFAR100_SUPERCLASS
     elif dataset == 'imagenet':
