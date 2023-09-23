@@ -51,7 +51,7 @@ elif P.mode in ['ood', 'ood_pre']:
 
 
 
-     with torch.no_grad():
+    with torch.no_grad():
         auroc_dict = eval_ood_detection_2(P, model, test_loader, ood_test_loader, P.ood_score,
                                         train_loader=train_loader, simclr_aug=simclr_aug)
 
@@ -82,7 +82,7 @@ elif P.mode in ['ood', 'ood_pre']:
 
 
     
-     with torch.no_grad():
+    with torch.no_grad():
         auroc_dict = eval_ood_detection_3(P, model, test_loader, ood_test_loader, P.ood_score,
                                         train_loader=train_loader, simclr_aug=simclr_aug)
 
