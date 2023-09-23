@@ -203,16 +203,19 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         test_set = datasets.CIFAR100(DATA_PATH, train=False, download=download, transform=test_transform)
     
     elif dataset == 'mnist':
+        image_size = (32, 32, 1)
+        n_classes = 10
         train_transform = transforms.Compose([
+            transform.Resize((image_size[0], image_size[1]))
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
         test_transform = transforms.Compose([
+            transform.Resize((image_size[0], image_size[1]))
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
-        image_size = (32, 32, 1)
-        n_classes = 10
+        
         train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
     elif dataset == 'svhn-10':
