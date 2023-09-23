@@ -44,7 +44,7 @@ train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, d
 P.image_size = image_size
 P.n_classes = n_classes
 
-main_count = 10000
+main_count = 5000
 if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
@@ -90,7 +90,8 @@ for ood in P.ood_dataset:
     else:
         ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
-train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size, count=main_count)
+train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size, count=len(train_set))
+print("exposure loader batches, train loader batchs", len(train_exposure_loader), len(train_loader))
 
 ### Initialize model ###
 

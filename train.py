@@ -21,7 +21,7 @@ else:
     linear = model.linear
 linear_optim = torch.optim.Adam(linear.parameters(), lr=1e-3, betas=(.9, .999), weight_decay=P.weight_decay)
 
-save_step = 5
+save_step = 20
 # Run experiments
 for epoch in range(start_epoch, P.epochs + 1):
     logger.log_dirname(f"Epoch {epoch}")
@@ -40,7 +40,15 @@ for epoch in range(start_epoch, P.epochs + 1):
     if (epoch % save_step == 0):
         save_states = model.state_dict()
         save_checkpoint(epoch, save_states, optimizer.state_dict(), logger.logdir)
-
+        '''
+        from evals.ood_pre import eval_ood_detection
+        P.load_path = logger.logdir
+        P.ood_layer = ("simclr", "shift")
+        P.ood_score = ["CSI"]
+        with torch.no_grad():
+            auroc_dict = eval_ood_detection(P, model, test_loader, ood_test_loader, P.ood_score,
+                                        train_loader=train_loader, simclr_aug=simclr_aug)
+        '''
 epoch += 1
 if P.multi_gpu:
     save_states = model.module.state_dict()
