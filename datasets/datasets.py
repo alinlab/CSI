@@ -218,6 +218,7 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         
         train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
+        print("wwwwwwwwwww:  ", len(train_set), len(test_set))
     elif dataset == 'svhn-10':
         image_size = (32, 32, 3)
         n_classes = 10
