@@ -210,20 +210,65 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection"):
     return  train_ds_mvtech_normal, test_ds_mvtech, image_size, n_classes
         
         
-        
+
+class FakeMVTecDataset(Dataset):
+    def __init__(self, root, category, transform=None, target_transform=None, train=True, count=None):
+        self.transform = transform
+        self.image_files = []
+        self.image_files = glob(os.path.join(root, category, "*.jpeg"))
+        if count:
+            if count<len(self.image_files):
+                self.image_files = self.image_files[:count]
+            else:
+                t = len(self.image_files)
+                print(len(self.image_files), t)
+                for i in range(count-len(self.image_files)):
+                    
+                    self.image_files.append(random.choice(self.image_files))
+        self.image_files.sort(key=lambda y: y.lower())
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        target = 1
+        return image, target
+    def __len__(self):
+        return len(self.image_files)
 
 
-def get_exposure_dataloader(batch_size = 64, image_size = (32, 32),
-                            base_path = './tiny-imagenet-200', count=-1):
-    
+def get_exposure_dataloader(P, batch_size = 64, image_size = (32, 32),
+                            base_path = './tiny-imagenet-200', fake_root="./MvTechAD", count=-1):
     tiny_transform = transforms.Compose([
-            transforms.Resize((image_size[0], image_size[1])),
-            transforms.AutoAugment(),
-            transforms.ToTensor()
-    ])
-    imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
-    print("number of exposure:", len(imagenet_exposure))
-    train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.AutoAugment(),
+                transforms.ToTensor()
+        ])
+    fake_transform = transforms.Compose([
+        transforms.Resize((256,256)),
+        transforms.CenterCrop((224, 224)),
+        transforms.ToTensor()
+        ])
+
+    if P.dataset == "MVTecAD":
+        fake_count = 0.5*count
+        count = 0.5*count
+        imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
+        train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
+        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure])
+        print("number of exposure:", len(exposureset))
+        train_loader = DataLoader(exposureset, batch_size = batch_size)
+    else:
+        tiny_transform = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.AutoAugment(),
+                transforms.ToTensor()
+        ])
+        imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
+        print("number of exposure:", len(imagenet_exposure))
+        train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
     return train_loader
 
 def get_dataset(P, dataset, test_only=False, image_size=None, download=False, eval=False):
