@@ -217,7 +217,7 @@ class FakeMVTecDataset(Dataset):
         self.transform = transform
         self.image_files = []
         self.image_files = glob(os.path.join(root, category, "*.jpeg"))
-        if count==-1:
+        if count!=-1:
             if count<len(self.image_files):
                 self.image_files = self.image_files[:count]
             else:
