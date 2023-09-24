@@ -186,10 +186,12 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         image_size = (32, 32, 3)
         n_classes = 10
         train_transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
         test_transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
