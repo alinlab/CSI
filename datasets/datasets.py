@@ -222,9 +222,7 @@ class FakeMVTecDataset(Dataset):
                 self.image_files = self.image_files[:count]
             else:
                 t = len(self.image_files)
-                print(len(self.image_files), t)
                 for i in range(count-len(self.image_files)):
-                    
                     self.image_files.append(random.choice(self.image_files))
         self.image_files.sort(key=lambda y: y.lower())
 
@@ -239,7 +237,7 @@ class FakeMVTecDataset(Dataset):
         return len(self.image_files)
 
 class MVTecDataset_Cutpasted(Dataset):
-    def __init__(self, root, category, transform=None, train=True, count=None):
+    def __init__(self, root, category, transform=None, train=True, count=-1):
         self.transform = transform
         self.image_files = []
         if train:
@@ -249,12 +247,10 @@ class MVTecDataset_Cutpasted(Dataset):
             normal_image_files = glob(os.path.join(root, category, "test", "good", "*.png"))
             anomaly_image_files = list(set(image_files) - set(normal_image_files))
             self.image_files = image_files
-        if count:
+        if count!=-1:
             if count<len(self.image_files):
                 self.image_files = self.image_files[:count]
             else:
-                # t = len(self.image_files)
-                print(self.image_files)
                 for i in range(count-len(self.image_files)):
                     self.image_files.append(random.choice(self.image_files))
         self.image_files.sort(key=lambda y: y.lower())
