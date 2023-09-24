@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 from common.common import parse_args
 import models.classifier as C
-from datasets import get_dataset, get_superclass_list, get_subclass_dataset, get_exposure_dataloader
+from datasets import mvtecad_dataset, get_dataset, get_superclass_list, get_subclass_dataset, get_exposure_dataloader
 from utils.utils import load_checkpoint
 
 P = parse_args()
@@ -40,15 +40,25 @@ else:
 P.ood_layer = P.ood_layer[0]
 
 ### Initialize dataset ###
-train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True)
+if P.dataset=="MVTecAD":
+    train_set, test_set, image_size, n_classes = mvtecad_dataset(P=P, category=P.one_class_idx, root = "./mvtec_anomaly_detection")
+else:
+    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True)
 P.image_size = image_size
 P.n_classes = n_classes
+print("full test set:", len(test_set))
+
 if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
-    train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
-    test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+    if P.dataset=="MVTecAD":
+        test_set = get_subclass_dataset(test_set, classes=0)
+    else:
+        train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
+        test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+
+print("normal test set:", len(test_set))
 
 kwargs = {'pin_memory': False, 'num_workers': 4}
 
@@ -61,7 +71,7 @@ else:
     train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
     test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
-if P.ood_dataset is None:
+if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
         P.ood_dataset = list(range(P.n_superclasses))
         P.ood_dataset.pop(P.one_class_idx)
@@ -69,7 +79,8 @@ if P.ood_dataset is None:
             P.ood_dataset = ['svhn', 'cifar100', 'mnist', 'imagenet', "fashion-mnist"]
     elif P.dataset == 'imagenet':
         P.ood_dataset = ['cub', 'stanford_dogs', 'flowers102']
-
+if P.dataset=="MVTecAD":
+    P.ood_dataset = [1]
 ood_test_loader = dict()
 for ood in P.ood_dataset:
     if ood == 'interp':
@@ -81,6 +92,7 @@ for ood in P.ood_dataset:
         ood = f'one_class_{ood}'  # change save name
     else:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, download=True)
+    print(f"testset anomaly(class {ood}):", len(ood_test_set))
 
     if P.multi_gpu:
         ood_sampler = DistributedSampler(ood_test_set, num_replicas=P.n_gpus, rank=P.local_rank)
@@ -88,9 +100,9 @@ for ood in P.ood_dataset:
     else:
         ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
-train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size, count=len(train_set))
+train_exposure_loader = get_exposure_dataloader(batch_size=P.batch_size, count=len(train_set), image_size=P.image_size)
 print("exposure loader batches, train loader batchs", len(train_exposure_loader), len(train_loader))
-
+print("train_set:", len(train_set))
 ### Initialize model ###
 
 simclr_aug = C.get_simclr_augmentation(P, image_size=P.image_size).to(device)

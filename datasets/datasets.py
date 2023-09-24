@@ -21,6 +21,7 @@ IMAGENET_SUPERCLASS = list(range(30))  # one class
 MNIST_SUPERCLASS = list(range(10))
 SVHN_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))
+MVTecAD_SUPERCLASS = list(range(2))
 
 CIFAR100_SUPERCLASS = [
     [4, 31, 55, 72, 95],
@@ -152,6 +153,65 @@ class ImageNetExposure(Dataset):
     def __len__(self):
         return len(self.image_files)
 
+class MVTecDataset(Dataset):
+    def __init__(self, root, category, transform=None, train=True, count=-1):
+        self.transform = transform
+        self.image_files = []
+        if train:
+            self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
+        else:
+            image_files = glob(os.path.join(root, category, "test", "*", "*.png"))
+            normal_image_files = glob(os.path.join(root, category, "test", "good", "*.png"))
+            anomaly_image_files = list(set(image_files) - set(normal_image_files))
+            self.image_files = image_files
+        if count != -1:
+            if count<len(self.image_files):
+                self.image_files = self.image_files[:count]
+            else:
+                t = len(self.image_files)
+                for i in range(count-len(self.image_files)):
+                    self.image_files.append(random.choice(self.image_files[:t]))
+        self.image_files.sort(key=lambda y: y.lower())
+        self.train = train
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        if os.path.dirname(image_file).endswith("good"):
+            target = 0
+        else:
+            target = 1
+        return image, target
+
+    def __len__(self):
+        return len(self.image_files)
+
+def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection"):
+    image_size = (224, 224, 3)
+    n_classes = 2
+    categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
+    train_transform = transforms.Compose([
+            transforms.Resize((256, 256)),
+            transforms.CenterCrop((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+    
+    test_transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+    
+    test_ds_mvtech = MVTecDataset(root=root, train=False, category=categories[category], transform=test_transform, count=-1)
+    train_ds_mvtech_normal = MVTecDataset(root=root, train=True, category=categories[category], transform=train_transform, count=P.main_count)
+    
+    return  train_ds_mvtech_normal, test_ds_mvtech, image_size, n_classes
+        
+        
+        
+
 
 def get_exposure_dataloader(batch_size = 64, image_size = (32, 32),
                             base_path = './tiny-imagenet-200', count=-1):
@@ -162,6 +222,7 @@ def get_exposure_dataloader(batch_size = 64, image_size = (32, 32),
             transforms.ToTensor()
     ])
     imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
+    print("number of exposure:", len(imagenet_exposure))
     train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
     return train_loader
 
@@ -181,7 +242,6 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         n_classes = 10
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
-
     elif dataset == 'fashion-mnist':
         image_size = (32, 32, 3)
         n_classes = 10
@@ -197,7 +257,7 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         ])
         train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
-    
+
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
         n_classes = 100
@@ -318,9 +378,11 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
 def get_superclass_list(dataset):
     if dataset == 'svhn-10':
         return SVHN_SUPERCLASS
-    if dataset == 'cifar10':
+    elif dataset == 'MVTecAD':
+        return MVTecAD_SUPERCLASS
+    elif dataset == 'cifar10':
         return CIFAR10_SUPERCLASS
-    if dataset == 'fashion-mnist':
+    elif dataset == 'fashion-mnist':
         return FashionMNIST_SUPERCLASS
     elif dataset == 'mnist':
         return MNIST_SUPERCLASS

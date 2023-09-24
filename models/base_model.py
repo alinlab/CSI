@@ -23,7 +23,6 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         _return_aux = False
 
         features = self.penultimate(inputs)
-
         output = self.linear(features)
 
         if penultimate:
