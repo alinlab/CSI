@@ -63,6 +63,7 @@ if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
 if P.dataset=="MVTecAD":
     P.ood_dataset = [1]
 ood_test_loader = dict()
+main_OOD_dataset = []
 for ood in P.ood_dataset:
     if ood == 'interp':
         ood_test_loader[ood] = None  # dummy loader
@@ -74,8 +75,12 @@ for ood in P.ood_dataset:
     else:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, eval=ood_eval, download=True)
     print(f"testset anomaly(class {ood}):", len(ood_test_set))
-
+    # main_OOD_dataset.append(deepcopy(ood_test_set))
     ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+
+#_main_OOD_dataset_ = torch.utils.data.ConcatDataset(main_OOD_dataset)
+# ood_test_loader["One-Versus-All"] = DataLoader(_main_OOD_dataset_, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+
 print("train loader batchs", len(train_loader))
 print("train_set:", len(train_set))
 ### Initialize model ###
