@@ -192,6 +192,11 @@ class Pretrain_ResNet(BaseModel):
         self.norm = lambda x: (x - mu) / std
         self.backbone = models.resnet18(pretrained=True)
         self.backbone.fc = torch.nn.Identity()
+        i = 30
+        for param in model.parameters():
+            if i<num:
+                param.requires_grad = False
+            i+=1
         #self.backbone =models.resnet18(pretrained=False)
         #checkpoint = torch.load("./resnet18_linf_eps8.0.ckpt")
         #state_dict_path = 'model'

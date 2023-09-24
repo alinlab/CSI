@@ -36,7 +36,12 @@ for epoch in range(start_epoch, P.epochs + 1):
     kwargs['linear_optim'] = linear_optim
     kwargs['simclr_aug'] = simclr_aug
 
+    if epoch => 50:
+        for param in model.parameters():
+            param.requires_grad = True
+
     train(P, epoch, model, criterion, optimizer, scheduler_warmup, train_loader, train_exposure_loader=train_exposure_loader, logger=logger, **kwargs)
+
     model.eval()
     if (epoch % save_step == 0):
         save_states = model.state_dict()
