@@ -7,7 +7,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 
 from utils.utils import set_random_seed
-
+from datasets.cutpast_transformation import *
 from PIL import Image
 from glob import glob
 import random
@@ -196,6 +196,7 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection"):
     train_transform = transforms.Compose([
             transforms.Resize((256, 256)),
             transforms.CenterCrop((image_size[0], image_size[1])),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
         ])
     
@@ -233,39 +234,75 @@ class FakeMVTecDataset(Dataset):
         image = image.convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-        target = 1
-        return image, target
+        return image
     def __len__(self):
         return len(self.image_files)
 
+class MVTecDataset_Cutpasted(Dataset):
+    def __init__(self, root, category, transform=None, train=True, count=None):
+        self.transform = transform
+        self.image_files = []
+        if train:
+            self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
+        else:
+            image_files = glob(os.path.join(root, category, "test", "*", "*.png"))
+            normal_image_files = glob(os.path.join(root, category, "test", "good", "*.png"))
+            anomaly_image_files = list(set(image_files) - set(normal_image_files))
+            self.image_files = image_files
+        if count:
+            if count<len(self.image_files):
+                self.image_files = self.image_files[:count]
+            else:
+                t = len(self.image_files)
+                for i in range(count-len(self.image_files)):
+                    self.image_files.append(random.choice(self.image_files[:t]))
+        self.image_files.sort(key=lambda y: y.lower())
+        self.train = train
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        return image
 
+    def __len__(self):
+        return len(self.image_files)
+    
 def get_exposure_dataloader(P, batch_size = 64, image_size = (32, 32),
-                            base_path = './tiny-imagenet-200', fake_root="./MvTechAD", count=-1):
+                            base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="/mvtec_anomaly_detection" ,count=-1):
+    categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
     tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.AutoAugment(),
+                transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
-        ])
-    fake_transform = transforms.Compose([
-        transforms.Resize((256,256)),
-        transforms.CenterCrop((224, 224)),
-        transforms.ToTensor()
         ])
 
     if P.dataset == "MVTecAD":
-        fake_count = 0.5*count
-        count = 0.5*count
-        imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
+        fake_transform = transforms.Compose([
+            transforms.Resize((256,256)),
+            transforms.CenterCrop((image_size[0], image_size[1])),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor()
+        ])
+        train_transform_cutpasted = transforms.Compose([
+            transforms.Resize((256,256)),
+            transforms.CenterCrop((image_size[0], image_size[1])),
+            CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
+        ])
+        fake_count = int(0.33*count)
+        tiny_count = int(0.33*count)
+        cutpast_count = int(0.33*count)
+        if (fake_count+tiny_count)!=count:
+            tiny_count += (count - (fake_count+tiny_count+cutpast_count))
+        imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
-        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure])
+        train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
+        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     else:
-        tiny_transform = transforms.Compose([
-                transforms.Resize((image_size[0], image_size[1])),
-                transforms.AutoAugment(),
-                transforms.ToTensor()
-        ])
         imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
         print("number of exposure:", len(imagenet_exposure))
         train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
