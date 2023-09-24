@@ -293,20 +293,19 @@ def get_exposure_dataloader(P, batch_size = 64, image_size = (32, 32),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
         fake_count = int(P.fake_data_percent*count)
-        tiny_count = int((1-P.fake_data_percent)*count)
-        # cutpast_count = int(0.33*count)
-        # if (fake_count+tiny_count+cutpast_count)!=count:
-        #    tiny_count += (count - (fake_count+tiny_count+cutpast_count))
+        tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent)*count)
+        cutpast_count = int(P.cutpast_data_percent*count)
 
-        if (fake_count+tiny_count)!=count:
-            tiny_count += (count - (fake_count+tiny_count))
+        if (fake_count+tiny_count+cutpast_count)!=count:
+            tiny_count += (count - (cutpast_count+fake_count+tiny_count))
+            
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
-        # train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
-        # exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
+        train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
         print("number of fake data:", len(train_ds_mvtech_fake))
         print("number of tiny data:", len(imagenet_exposure))
-        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure])
+        print("number of cutpasted data:", len(train_ds_mvtech_cutpasted))
+        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
 
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
