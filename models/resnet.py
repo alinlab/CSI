@@ -193,7 +193,7 @@ class Pretrain_ResNet(BaseModel):
         self.backbone = models.resnet18(pretrained=True)
         self.backbone.fc = torch.nn.Identity()
         i = 30
-        for param in model.parameters():
+        for param in self.backbone.parameters():
             if i<num:
                 param.requires_grad = False
             i+=1
