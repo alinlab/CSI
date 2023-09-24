@@ -216,5 +216,5 @@ def ResNet34(num_classes):
 def ResNet50(num_classes):
     return ResNet(Bottleneck, [3,4,6,3], num_classes=num_classes)
 
-def Pretrain_ResNet18_Model(num_classes)
+def Pretrain_ResNet18_Model(num_classes):
     return Pretrain_ResNet(BasicBlock, [2,2,2,2], num_classes=num_classes)
