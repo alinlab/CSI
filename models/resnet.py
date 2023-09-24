@@ -192,7 +192,8 @@ class Pretrain_ResNet(BaseModel):
         self.norm = lambda x: (x - mu) / std
         self.backbone = models.resnet18(pretrained=True)
         self.backbone.fc = torch.nn.Identity()
-        i = 30
+        i = 0
+        num = 30
         for param in self.backbone.parameters():
             if i<num:
                 param.requires_grad = False
