@@ -12,7 +12,7 @@ def parse_args(default=False):
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
     parser.add_argument('--fake_data_percent', help='',
-                        default=0.2, type=int)
+                        default=0.2, type=float)
     parser.add_argument('--main_count', help='count of normal data',
                         default=-1, type=int)
     parser.add_argument('--model', help='Model',
