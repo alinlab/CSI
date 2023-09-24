@@ -178,6 +178,34 @@ class ResNet(BaseModel):
         else:
             return out
 
+class Pretrain_ResNet(BaseModel):
+    def __init__(self, block, num_blocks, num_classes=10):
+        last_dim = 512 * block.expansion
+        super(ResNet, self).__init__(last_dim, num_classes)
+
+        self.in_planes = 64
+        self.last_dim = last_dim
+
+        mu = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1).cuda()
+        std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1).cuda()
+        self.norm = lambda x: (x - mu) / std
+        self.backbone = models.resnet18(pretrained=True)
+        self.backbone.fc = torch.nn.Identity()
+        #self.backbone =models.resnet18(pretrained=False)
+        #checkpoint = torch.load("./resnet18_linf_eps8.0.ckpt")
+        #state_dict_path = 'model'
+        #sd = checkpoint[state_dict_path]
+        #sd = {k[len('module.'):]:v for k,v in sd.items()}
+        #sd_t = {k[len('attacker.model.'):]:v for k,v in sd.items() if k.split('.')[0]=='attacker' and k.split('.')[1]!='normalize'}
+        #self.backbone.load_state_dict(sd_t)        
+        #self.backbone.fc = torch.nn.Identity()        
+        # freeze_parameters(self.backbone, backbone, train_fc=False)
+
+    def penultimate(self, x, all_features=False):
+        x = self.norm(x)
+        z1 = self.backbone(x)
+        z_n = F.normalize(z1, dim=-1)
+        return z_n
 
 def ResNet18(num_classes):
     return ResNet(BasicBlock, [2,2,2,2], num_classes=num_classes)
@@ -187,3 +215,6 @@ def ResNet34(num_classes):
 
 def ResNet50(num_classes):
     return ResNet(Bottleneck, [3,4,6,3], num_classes=num_classes)
+
+def Pretrain_ResNet18_Model(num_classes)
+    return Pretrain_ResNet(BasicBlock, [2,2,2,2], num_classes=num_classes)
