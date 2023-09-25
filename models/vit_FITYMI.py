@@ -624,8 +624,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# from models.base_model import BaseModel
-# from models.transform_layers import NormalizeLayer
+from models.base_model import BaseModel
+from models.transform_layers import NormalizeLayer
 from torch.nn.utils import spectral_norm
 from torchvision import models
 import timm
