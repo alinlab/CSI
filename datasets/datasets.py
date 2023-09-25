@@ -270,7 +270,7 @@ class MVTecDataset_Cutpasted(Dataset):
         return len(self.image_files)
     
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
-                            base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1):
+                            base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
     tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
@@ -278,6 +278,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
         ])
+    fake_count = int(P.fake_data_percent*count)
+    tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
+    cutpast_count = int(P.cutpast_data_percent*count)
 
     if P.dataset == "MVTecAD":
         fake_transform = transforms.Compose([
@@ -291,9 +294,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             transforms.CenterCrop((image_size[0], image_size[1])),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
-        fake_count = int(P.fake_data_percent*count)
-        tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
-        cutpast_count = int(P.cutpast_data_percent*count)
 
         if (fake_count+tiny_count+cutpast_count)!=count:
             tiny_count += (count - (cutpast_count+fake_count+tiny_count))
@@ -309,9 +309,21 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     else:
-        imagenet_exposure = ImageNetExposure(root=base_path, count=count, transform=tiny_transform)
-        print("number of exposure:", len(imagenet_exposure))
-        train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
+        train_transform_cutpasted = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
+        ])
+        cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size)
+        cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
+        cutpast_train_set.transform = train_transform_cutpasted
+        imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
+        
+        print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
+        print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
+
+        exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
+        print("number of exposure:", len(exposureset))
+        train_loader = DataLoader(exposureset, batch_size = batch_size)
     return train_loader
 
 def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False):
@@ -328,6 +340,10 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
     if dataset == 'cifar10':
         # image_size = (32, 32, 3)
         n_classes = 10
+        fake_count = int(P.fake_data_percent*count)
+        tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
+        cutpast_count = int(P.cutpast_data_percent*count)
+
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
