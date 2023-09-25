@@ -266,7 +266,7 @@ class MVTecDataset_Cutpasted(Dataset):
     def __len__(self):
         return len(self.image_files)
     
-def get_exposure_dataloader(P, batch_size = 64, image_size = (32, 32),
+def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
     tiny_transform = transforms.Compose([
@@ -311,7 +311,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size = (32, 32),
         train_loader = DataLoader(imagenet_exposure, batch_size = batch_size)
     return train_loader
 
-def get_dataset(P, dataset, test_only=False, image_size=None, download=False, eval=False):
+def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False):
     if dataset in ['imagenet', 'cub', 'stanford_dogs', 'flowers102',
                    'places365', 'food_101', 'caltech_256', 'dtd', 'pets']:
         if eval:
@@ -323,12 +323,12 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         train_transform, test_transform = get_transform(image_size=image_size)
 
     if dataset == 'cifar10':
-        image_size = (32, 32, 3)
+        # image_size = (32, 32, 3)
         n_classes = 10
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
     elif dataset == 'fashion-mnist':
-        image_size = (32, 32, 3)
+        # image_size = (32, 32, 3)
         n_classes = 10
         train_transform = transforms.Compose([
             transforms.Resize((image_size[0], image_size[1])),
@@ -344,13 +344,13 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
 
     elif dataset == 'cifar100':
-        image_size = (32, 32, 3)
+        # image_size = (32, 32, 3)
         n_classes = 100
         train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR100(DATA_PATH, train=False, download=download, transform=test_transform)
     
     elif dataset == 'mnist':
-        image_size = (32, 32, 1)
+        # image_size = (32, 32, 1)
         n_classes = 10
         train_transform = transforms.Compose([
             transforms.Resize((image_size[0], image_size[1])),
@@ -366,7 +366,7 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
     elif dataset == 'svhn-10':
-        image_size = (32, 32, 3)
+        # image_size = (32, 32, 3)
         n_classes = 10
         train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=test_transform)
         test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=test_transform)

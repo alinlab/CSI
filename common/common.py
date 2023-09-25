@@ -11,6 +11,8 @@ def parse_args(default=False):
                         default="cifar10", type=str)
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
+    parser.add_argument('--image_size', help='None: multi-class, Not None: one-class',
+                        default=32, type=int)
     parser.add_argument('--fake_data_percent', help='',
                         default=0.0, type=float)
     parser.add_argument('--cutpast_data_percent', help='',
