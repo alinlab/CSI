@@ -41,9 +41,9 @@ P.ood_layer = P.ood_layer[0]
 
 ### Initialize dataset ###
 if P.image_size==32:
-    image_size_ = (224, 224, 3)
-else:
     image_size_ = (32, 32, 3)
+else:
+    image_size_ = (224, 224, 3)
 if P.dataset=="MVTecAD":
     train_set, test_set, image_size, n_classes = mvtecad_dataset(P=P, category=P.one_class_idx, root = "./mvtec_anomaly_detection",  image_size=image_size_)
 else:
@@ -104,7 +104,7 @@ for ood in P.ood_dataset:
     else:
         ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
-train_exposure_loader = get_exposure_dataloader(P=P, batch_size=P.batch_size, count=len(train_set), image_size=P.image_size)
+train_exposure_loader = get_exposure_dataloader(P=P, batch_size=P.batch_size, count=len(train_set), image_size=image_size_)
 print("exposure loader batches, train loader batchs", len(train_exposure_loader), len(train_loader))
 print("train_set:", len(train_set))
 ### Initialize model ###
