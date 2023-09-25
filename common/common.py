@@ -20,7 +20,7 @@ def parse_args(default=False):
     parser.add_argument('--main_count', help='count of normal data',
                         default=-1, type=int)
     parser.add_argument('--model', help='Model',
-                        choices=['vit', 'resnet18', 'resnet18_imagenet', 'pretrain-resnet18'], default="resnet18", type=str)
+                        choices=['vit_fitymi', 'vit', 'resnet18', 'resnet18_imagenet', 'pretrain-resnet18'], default="resnet18", type=str)
     parser.add_argument('--mode', help='Training mode',
                         default='simclr', type=str)
     parser.add_argument('--simclr_dim', help='Dimension of simclr layer',
