@@ -22,6 +22,7 @@ def conv3x3(in_planes, out_planes, stride=1):
 
 class Pretrain_VIT(BaseModel):
     def __init__(self, num_classes=10):
+        last_dim = 768
         super(Pretrain_VIT, self).__init__(last_dim, num_classes)
 
         self.in_planes = 64
