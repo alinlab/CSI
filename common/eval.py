@@ -25,7 +25,7 @@ ood_eval = P.mode == 'ood_pre'
 if P.dataset == 'imagenet' and ood_eval:
     P.batch_size = 1
     P.test_batch_size = 1
-if image_size==32:
+if P.image_size==32:
     image_size_ = (224, 224, 3)
 else:
     image_size_ = (32, 32, 3)
