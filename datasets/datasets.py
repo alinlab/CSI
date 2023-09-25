@@ -340,10 +340,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
     if dataset == 'cifar10':
         # image_size = (32, 32, 3)
         n_classes = 10
-        fake_count = int(P.fake_data_percent*count)
-        tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
-        cutpast_count = int(P.cutpast_data_percent*count)
-
+        
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
