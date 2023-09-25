@@ -54,5 +54,5 @@ class Pretrain_ResNet(BaseModel):
         z_n = F.normalize(z1, dim=-1)
         return z_n
 
-def VIT(num_classes):
+def VIT_Pretrain(num_classes):
     return ResNet(BasicBlock, [2,2,2,2], num_classes=num_classes)
