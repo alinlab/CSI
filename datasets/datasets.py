@@ -269,6 +269,18 @@ class MVTecDataset_Cutpasted(Dataset):
     def __len__(self):
         return len(self.image_files)
     
+
+class DataOnlyDataset(Dataset):
+    def __init__(self, original_dataset):
+        self.original_dataset = original_dataset
+
+    def __len__(self):
+        return len(self.original_dataset)
+
+    def __getitem__(self, idx):
+        sample = self.original_dataset[idx][0]
+        return sample
+
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
@@ -316,6 +328,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size)
         cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
         cutpast_train_set.transform = train_transform_cutpasted
+        cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         
         print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
