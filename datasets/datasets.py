@@ -189,8 +189,8 @@ class MVTecDataset(Dataset):
     def __len__(self):
         return len(self.image_files)
 
-def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection"):
-    image_size = (224, 224, 3)
+def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size):
+    # image_size = (224, 224, 3)
     n_classes = 2
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
     train_transform = transforms.Compose([
