@@ -189,7 +189,7 @@ class MVTecDataset(Dataset):
     def __len__(self):
         return len(self.image_files)
 
-def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size):
+def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size=(224, 224, 3)):
     # image_size = (224, 224, 3)
     n_classes = 2
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
@@ -207,6 +207,9 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size)
     
     test_ds_mvtech = MVTecDataset(root=root, train=False, category=categories[category], transform=test_transform, count=-1)
     train_ds_mvtech_normal = MVTecDataset(root=root, train=True, category=categories[category], transform=train_transform, count=P.main_count)
+    
+    print("test_ds_mvtech shapes: ", test_ds_mvtech[0][0].shape)
+    print("train_ds_mvtech_normal shapes: ", train_ds_mvtech_normal[0][0].shape)
     
     return  train_ds_mvtech_normal, test_ds_mvtech, image_size, n_classes
         
@@ -298,9 +301,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
         train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
-        print("number of fake data:", len(train_ds_mvtech_fake))
-        print("number of tiny data:", len(imagenet_exposure))
-        print("number of cutpasted data:", len(train_ds_mvtech_cutpasted))
+        print("number of fake data:", len(train_ds_mvtech_fake), 'shape:', train_ds_mvtech_fake[0][0].shape)
+        print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
+        print("number of cutpasted data:", len(train_ds_mvtech_cutpasted), 'shape:', train_ds_mvtech_cutpasted[0][0].shape)
         exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
 
         print("number of exposure:", len(exposureset))
@@ -327,6 +330,9 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         n_classes = 10
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+    
     elif dataset == 'fashion-mnist':
         # image_size = (32, 32, 3)
         n_classes = 10
@@ -342,13 +348,15 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         ])
         train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
-
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'cifar100':
         # image_size = (32, 32, 3)
         n_classes = 100
         train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR100(DATA_PATH, train=False, download=download, transform=test_transform)
-    
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'mnist':
         # image_size = (32, 32, 1)
         n_classes = 10
@@ -365,12 +373,15 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         
         train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'svhn-10':
         # image_size = (32, 32, 3)
         n_classes = 10
         train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=test_transform)
         test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=test_transform)
-
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'svhn':
         assert test_only and image_size is not None
         test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=test_transform)
@@ -402,6 +413,8 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         test_dir = os.path.join(IMAGENET_PATH, 'one_class_test')
         train_set = datasets.ImageFolder(train_dir, transform=train_transform)
         test_set = datasets.ImageFolder(test_dir, transform=test_transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
 
     elif dataset == 'stanford_dogs':
         assert test_only and image_size is not None
