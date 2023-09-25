@@ -26,9 +26,9 @@ if P.dataset == 'imagenet' and ood_eval:
     P.batch_size = 1
     P.test_batch_size = 1
 if P.image_size==32:
-    image_size_ = (224, 224, 3)
-else:
     image_size_ = (32, 32, 3)
+else:
+    image_size_ = (224, 224, 3)
 if P.dataset=="MVTecAD":
     train_set, test_set, image_size, n_classes = mvtecad_dataset(P=P, category=P.one_class_idx, root = "./mvtec_anomaly_detection",  image_size=image_size_)
 else:
