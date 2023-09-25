@@ -21,12 +21,11 @@ def conv3x3(in_planes, out_planes, stride=1):
 
 
 class Pretrain_VIT(BaseModel):
-    def __init__(self, block, num_blocks, num_classes=10):
-        last_dim = 512 * block.expansion
+    def __init__(self, num_classes=10):
         super(Pretrain_VIT, self).__init__(last_dim, num_classes)
 
         self.in_planes = 64
-        self.last_dim = last_dim
+        self.last_dim = 768
 
         mu = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1).cuda()
         std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1).cuda()
@@ -47,4 +46,4 @@ class Pretrain_VIT(BaseModel):
         return z_n
 
 def VIT_Pretrain(num_classes):
-    return Pretrain_VIT(BasicBlock, [2,2,2,2], num_classes=num_classes)
+    return Pretrain_VIT(num_classes=num_classes)
