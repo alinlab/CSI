@@ -12,7 +12,7 @@ from PIL import Image
 from glob import glob
 import random
 
- import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import cv2
@@ -399,7 +399,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.CenterCrop(224),
             transforms.ToTensor(),
         ])
-        
+
         labels_df = pd.read_csv('./head-ct/labels.csv')
         labels = np.array(labels_df[' hemorrhage'].tolist())
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
