@@ -357,7 +357,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size)
-        if P.dataset!='head-ct':
+        if P.dataset=='head-ct':
+            cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
+        else:
             cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
         cutpast_train_set.transform = train_transform_cutpasted
         cutpast_train_set = DataOnlyDataset(cutpast_train_set)
@@ -615,6 +617,20 @@ def get_subclass_dataset(dataset, classes, count=-1):
 
     return dataset
 
+def set_dataset_count(dataset, count=-1):
+    if count==-1:
+        pass
+    elif len(dataset)>count:
+        dataset = Subset(dataset, [i for i in range(count)])
+    else:
+        num = int(count / len(dataset))
+        remainding = (count - num*len(dataset))
+        trnsets = [dataset for i in range(num)]
+        dataset = Subset(dataset, [i for i in range(remainding)])
+        trnsets = trnsets + [dataset]
+        dataset = torch.utils.data.ConcatDataset(trnsets)
+
+    return dataset
 
 def get_simclr_eval_transform_imagenet(sample_num, resize_factor, resize_fix):
 
