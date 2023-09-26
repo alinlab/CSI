@@ -75,8 +75,22 @@ print("cls_list", cls_list)
 print("normal test set:", len(test_set))
 kwargs = {'pin_memory': False, 'num_workers': 4}
 
+
+
 train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
 test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+unique_labels = set()
+for _, labels in test_loader[ood]:
+    unique_labels.update(labels.tolist())
+unique_labels = sorted(list(unique_labels))
+print("Unique labels(test_loader):", unique_labels)
+unique_labels = set()
+for _, labels in train_loader[ood]:
+    unique_labels.update(labels.tolist())
+unique_labels = sorted(list(unique_labels))
+print("Unique labels(train_loader):", unique_labels)
+
+
 
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
@@ -104,6 +118,12 @@ for ood in P.ood_dataset:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, download=True)
     print(f"testset anomaly(class {ood}):", len(ood_test_set))
     ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+
+    unique_labels = set()
+    for _, labels in ood_test_loader[ood]:
+        unique_labels.update(labels.tolist())
+    unique_labels = sorted(list(unique_labels))
+    print("Unique labels(ood_test_loader):", unique_labels)
 
 train_exposure_loader = get_exposure_dataloader(P=P, batch_size=P.batch_size, count=len(train_set), image_size=image_size_, cls_list=cls_list)
 print("exposure loader batches, train loader batchs", len(train_exposure_loader), len(train_loader))
