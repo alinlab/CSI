@@ -60,6 +60,9 @@ print("normal test set:", len(test_set))
 kwargs = {'pin_memory': False, 'num_workers': 4}
 print("cls_list", cls_list)
 
+train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
+test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+
 
 
 unique_labels = set()
@@ -74,9 +77,6 @@ unique_labels = sorted(list(unique_labels))
 print("Unique labels(train_loader):", unique_labels)
 
 
-
-train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
-test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
