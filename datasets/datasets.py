@@ -377,7 +377,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         
-        print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
+        if len(cutpast_train_set) > 0:
+            print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
+        
         print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
 
         exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
