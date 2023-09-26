@@ -389,7 +389,17 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'head-ct':
-
+        train_transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.RandomResizedCrop(224),
+            transforms.ToTensor(),
+        ])
+        test_transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+        ])
+        
         labels_df = pd.read_csv('./head-ct/labels.csv')
         labels = np.array(labels_df[' hemorrhage'].tolist())
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
