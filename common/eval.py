@@ -60,6 +60,21 @@ print("normal test set:", len(test_set))
 kwargs = {'pin_memory': False, 'num_workers': 4}
 print("cls_list", cls_list)
 
+
+
+unique_labels = set()
+for _, labels in test_loader:
+    unique_labels.update(labels.tolist())
+unique_labels = sorted(list(unique_labels))
+print("Unique labels(test_loader):", unique_labels)
+unique_labels = set()
+for _, labels in train_loader:
+    unique_labels.update(labels.tolist())
+unique_labels = sorted(list(unique_labels))
+print("Unique labels(train_loader):", unique_labels)
+
+
+
 train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
 test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
@@ -92,7 +107,12 @@ for ood in P.ood_dataset:
     print(f"testset anomaly(class {ood}):", len(ood_test_set))
     # main_OOD_dataset.append(deepcopy(ood_test_set))
     ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
-
+    
+    unique_labels = set()
+    for _, labels in ood_test_loader[ood]:
+        unique_labels.update(labels.tolist())
+    unique_labels = sorted(list(unique_labels))
+    print("Unique labels(ood_test_loader):", unique_labels)
 #_main_OOD_dataset_ = torch.utils.data.ConcatDataset(main_OOD_dataset)
 # ood_test_loader["One-Versus-All"] = DataLoader(_main_OOD_dataset_, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
