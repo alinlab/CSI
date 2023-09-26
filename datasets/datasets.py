@@ -12,6 +12,11 @@ from PIL import Image
 from glob import glob
 import random
 
+ import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import cv2
+
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
 
@@ -281,6 +286,31 @@ class DataOnlyDataset(Dataset):
         sample = self.original_dataset[idx][0]
         return sample
 
+class HEAD_CT_DATASET(Dataset):
+    def __init__(self, image_path, labels, transform=None, count=-1):
+        self.transform = transform
+        self.image_files = image_path
+        self.labels = labels
+        if count != -1:
+            if count<len(self.image_files):
+                self.image_files = self.image_files[:count]
+            else:
+                t = len(self.image_files)
+                for i in range(count-t):
+                    self.image_files.append(random.choice(self.image_files[:t]))
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, 1-self.labels[index]
+    
+    def __len__(self):
+        return len(self.image_files)
+
+
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
@@ -358,7 +388,28 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
-    
+    elif dataset == 'head-ct':
+
+        labels_df = pd.read_csv('./head-ct/labels.csv')
+        labels = np.array(labels_df[' hemorrhage'].tolist())
+        images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
+
+        indicies = np.random.permutation(100)
+        train_true_idx, test_true_idx = indicies[:75], indicies[75:]
+        train_false_idx, test_false_idx = indicies[:75] + 100, indicies[75:] + 100
+        train_idx, test_idx = train_true_idx, np.concatenate((test_true_idx, test_false_idx, train_false_idx))
+
+        train_image, train_label = images[train_idx], labels[train_idx]
+        test_image, test_label = images[test_idx], labels[test_idx]
+
+        print("train_image.shape, test_image.shape: ", train_image.shape, test_image.shape)
+        print("train_label.shape, test_label.shape: ", train_label.shape, test_label.shape)
+
+        train_set = HEAD_CT_DATASET(image_path=train_image, labels=train_label, transform=train_transform)
+        test_set = HEAD_CT_DATASET(image_path=test_image, labels=test_label, transform=test_transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+
     elif dataset == 'fashion-mnist':
         # image_size = (32, 32, 3)
         n_classes = 10
