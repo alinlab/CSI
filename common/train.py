@@ -59,7 +59,7 @@ if P.one_class_idx is not None:
     if P.high_var:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             print("erorr: These datasets are not proper for high_var settings!")
-            return
+            raise Exception()
         del cls_list[P.one_class_idx]
         train_set = get_subclass_dataset(train_set, classes=cls_list, count=P.main_count)
         test_set = get_subclass_dataset(test_set, classes=cls_list)
