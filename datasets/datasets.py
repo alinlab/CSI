@@ -27,6 +27,7 @@ MNIST_SUPERCLASS = list(range(10))
 SVHN_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))
 MVTecAD_SUPERCLASS = list(range(2))
+HEAD_CT_SUPERCLASS = list(range(2))
 
 CIFAR100_SUPERCLASS = [
     [4, 31, 55, 72, 95],
@@ -567,6 +568,8 @@ def get_superclass_list(dataset):
         return SVHN_SUPERCLASS
     elif dataset == 'MVTecAD':
         return MVTecAD_SUPERCLASS
+    elif dataset == 'head-ct':
+        return HEAD_CT_SUPERCLASS
     elif dataset == 'cifar10':
         return CIFAR10_SUPERCLASS
     elif dataset == 'fashion-mnist':
