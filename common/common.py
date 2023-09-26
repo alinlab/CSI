@@ -19,6 +19,8 @@ def parse_args(default=False):
                         default=0.0, type=float)
     parser.add_argument('--main_count', help='count of normal data',
                         default=-1, type=int)
+    parser.add_argument('--high_var', help='count of normal data',
+                        default=0, choices=[0, 1], type=int)
     parser.add_argument('--model', help='Model',
                         choices=['vit_fitymi', 'vit', 'resnet18', 'resnet18_imagenet', 'pretrain-resnet18'], default="resnet18", type=str)
     parser.add_argument('--mode', help='Training mode',

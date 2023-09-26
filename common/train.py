@@ -56,12 +56,21 @@ if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
-    if P.dataset=="MVTecAD" or P.dataset=='head-ct':
-        test_set = get_subclass_dataset(test_set, classes=0)
-        train_set = set_dataset_count(train_set, count=P.main_count)
+    if P.high_var:
+        if P.dataset=="MVTecAD" or P.dataset=='head-ct':
+            print("erorr: These datasets are not proper for high_var settings!")
+            return
+        del cls_list[P.one_class_idx]
+        train_set = get_subclass_dataset(train_set, classes=cls_list, count=P.main_count)
+        test_set = get_subclass_dataset(test_set, classes=cls_list)
+
     else:
-        train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
-        test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+        if P.dataset=="MVTecAD" or P.dataset=='head-ct':
+            test_set = get_subclass_dataset(test_set, classes=0)
+            train_set = set_dataset_count(train_set, count=P.main_count)
+        else:
+            train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
+            test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
 
 print("normal test set:", len(test_set))
 
@@ -78,8 +87,11 @@ else:
 
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
-        P.ood_dataset = list(range(P.n_superclasses))
-        P.ood_dataset.pop(P.one_class_idx)
+        if P.high_var:
+            P.ood_dataset = [P.one_class_idx]
+        else:
+            P.ood_dataset = list(range(P.n_superclasses))
+            P.ood_dataset.pop(P.one_class_idx)
     elif P.dataset == 'cifar10':
             P.ood_dataset = ['svhn', 'cifar100', 'mnist', 'imagenet', "fashion-mnist"]
     elif P.dataset == 'imagenet':
