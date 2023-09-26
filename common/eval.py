@@ -42,23 +42,34 @@ if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
-    if P.dataset=="MVTecAD" or P.dataset=='head-ct':
-        test_set = get_subclass_dataset(test_set, classes=0)
+    if P.high_var:
+        if P.dataset=="MVTecAD" or P.dataset=='head-ct':
+            print("erorr: These datasets are not proper for high_var settings!")
+            raise Exception()
+        del cls_list[P.one_class_idx]
+        train_set = get_subclass_dataset(train_set, classes=cls_list, count=P.main_count)
+        test_set = get_subclass_dataset(test_set, classes=cls_list)
     else:
-        train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
-        test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+        if P.dataset=="MVTecAD" or P.dataset=='head-ct':
+            test_set = get_subclass_dataset(test_set, classes=0)
+        else:
+            train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
+            test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
 
 print("normal test set:", len(test_set))
-
 kwargs = {'pin_memory': False, 'num_workers': 4}
+print("cls_list", cls_list)
 
 train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
 test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
-        P.ood_dataset = list(range(P.n_superclasses))
-        P.ood_dataset.pop(P.one_class_idx)
+        if P.high_var:
+            P.ood_dataset = [P.one_class_idx]
+        else:
+            P.ood_dataset = list(range(P.n_superclasses))
+            P.ood_dataset.pop(P.one_class_idx)
     elif P.dataset == 'cifar10':
         P.ood_dataset = ['svhn', 'lsun_resize', 'imagenet_resize', 'lsun_fix', 'imagenet_fix', 'cifar100', 'interp']
     elif P.dataset == 'imagenet':
