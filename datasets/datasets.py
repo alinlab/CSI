@@ -324,6 +324,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
     fake_count = int(P.fake_data_percent*count)
     tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
     cutpast_count = int(P.cutpast_data_percent*count)
+    if (fake_count+tiny_count+cutpast_count)!=count:
+        tiny_count += (count - (cutpast_count+fake_count+tiny_count))
 
     if P.dataset == "MVTecAD":
         fake_transform = transforms.Compose([
@@ -338,9 +340,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
 
-        if (fake_count+tiny_count+cutpast_count)!=count:
-            tiny_count += (count - (cutpast_count+fake_count+tiny_count))
-
+        
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
         train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
