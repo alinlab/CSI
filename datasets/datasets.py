@@ -352,10 +352,18 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     else:
-        train_transform_cutpasted = transforms.Compose([
-            transforms.Resize((image_size[0], image_size[1])),
-            CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
-        ])
+        if P.dataset=='head-ct':
+            train_transform_cutpasted = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.Grayscale(num_output_channels=3),
+                CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
+            ])
+        else:
+            train_transform_cutpasted = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
+            ])
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size)
         if P.dataset=='head-ct':
             cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
@@ -394,7 +402,8 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'head-ct':
         n_classes = 2
-
+        
+        '''
         train_transform = transforms.Compose([
             transforms.Resize(256),
             transforms.RandomResizedCrop(224),
@@ -405,7 +414,22 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.CenterCrop(224),
             transforms.ToTensor(),
         ])
+        '''
 
+        train_transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.RandomResizedCrop(224),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+        ])
+        test_transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.Grayscale(num_output_channels=1),
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+        ])
         labels_df = pd.read_csv('./head-ct/labels.csv')
         labels = np.array(labels_df[' hemorrhage'].tolist())
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
