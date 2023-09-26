@@ -63,7 +63,6 @@ if P.one_class_idx is not None:
         del cls_list[P.one_class_idx]
         train_set = get_subclass_dataset(train_set, classes=cls_list, count=P.main_count)
         test_set = get_subclass_dataset(test_set, classes=cls_list)
-
     else:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             test_set = get_subclass_dataset(test_set, classes=0)
@@ -72,6 +71,7 @@ if P.one_class_idx is not None:
             train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
             test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
 
+print("cls_list", cls_list)
 print("normal test set:", len(test_set))
 
 kwargs = {'pin_memory': False, 'num_workers': 4}
