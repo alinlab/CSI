@@ -357,7 +357,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size)
-        cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
+        if P.dataset!='head-ct':
+            cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
         cutpast_train_set.transform = train_transform_cutpasted
         cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)

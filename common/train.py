@@ -57,7 +57,6 @@ if P.one_class_idx is not None:
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
     if P.dataset=="MVTecAD" or P.dataset=='head-ct':
-        print("test_set len(before get_subclass_dataset):", test_set)
         test_set = get_subclass_dataset(test_set, classes=0)
     else:
         train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
