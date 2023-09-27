@@ -337,6 +337,31 @@ class FakeCIFAR10(Dataset):
     def __len__(self):
         return len(self.image_files)
 
+class FakeMNIST(Dataset):
+    def __init__(self, root, category, transform=None, target_transform=None, train=True, count=6000):
+        self.transform = transform
+        self.image_files = []
+        for i in range(len(category)):
+            img_files = list(np.load("./Fake_Mnist.npy")[6000*category:6000*(category+1)])
+            if count[i]<len(img_files):
+                img_files = img_files[:count[i]]
+            else:
+                t = len(img_files)
+                for i in range(count[i]-t):
+                    img_files.append(random.choice(img_files[:t]))            
+            self.image_files += img_files
+        self.image_files.sort(key=lambda y: y.lower())
+
+    def __getitem__(self, index):
+        image = Image.fromarray((self.image_files[index].transpose(1, 2, 0)*255).astype(np.uint8))
+        if self.transform is not None:
+            image = self.transform(image)
+        target = 1
+        return image, target
+    def __len__(self):
+        return len(self.image_files)
+
+
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
@@ -415,6 +440,24 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_cifar10_fake) > 0:
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
+        elif P.dataset=="cifar10":
+            fake_transform = transforms.Compose([
+                transforms.Resize((image_size[0],image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
+            if sum(fc) != fake_count:
+                fc[0] += abs(fake_count - sum(fc))                  
+            fake_root = './MNIST-Fake/'
+            train_ds_mnist_fake = FakeMNIST(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
+            if len(train_ds_mnist_fake) > 0:
+                print("number of fake data:", len(train_ds_mnist_fake), "shape:", train_ds_mnist_fake[0][0].shape)
+            
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_mnist_fake, imagenet_exposure])
+
+
+            
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         
