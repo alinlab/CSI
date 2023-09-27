@@ -174,9 +174,9 @@ class MVTecDataset(Dataset):
             if count<len(self.image_files):
                 self.image_files = self.image_files[:count]
             else:
-                # t = len(self.image_files)
-                for i in range(count-len(self.image_files)):
-                    self.image_files.append(random.choice(self.image_files))
+                t = len(self.image_files)
+                for i in range(count-len(self.image_files[:t])):
+                    self.image_files.append(random.choice(self.image_files[:t]))
         self.image_files.sort(key=lambda y: y.lower())
         self.train = train
 
@@ -231,8 +231,8 @@ class FakeMVTecDataset(Dataset):
                 self.image_files = self.image_files[:count]
             else:
                 t = len(self.image_files)
-                for i in range(count-len(self.image_files)):
-                    self.image_files.append(random.choice(self.image_files))
+                for i in range(count-len(self.image_files[:t])):
+                    self.image_files.append(random.choice(self.image_files[:t]))
         self.image_files.sort(key=lambda y: y.lower())
 
     def __getitem__(self, index):
@@ -260,8 +260,9 @@ class MVTecDataset_Cutpasted(Dataset):
             if count<len(self.image_files):
                 self.image_files = self.image_files[:count]
             else:
-                for i in range(count-len(self.image_files)):
-                    self.image_files.append(random.choice(self.image_files))
+                t = len(self.image_files)
+                for i in range(count-len(self.image_files[:t])):
+                    self.image_files.append(random.choice(self.image_files[:t]))
         self.image_files.sort(key=lambda y: y.lower())
         self.train = train
     def __getitem__(self, index):
@@ -311,6 +312,29 @@ class HEAD_CT_DATASET(Dataset):
     def __len__(self):
         return len(self.image_files)
 
+class FakeCIFAR10(Dataset):
+    def __init__(self, root, category, transform=None, target_transform=None, train=True, count=None):
+        self.transform = transform
+        self.image_files = []
+        self.image_files = glob(os.path.join(root, str(category), "*.jpeg"))
+        if count:
+            if count<len(self.image_files):
+                self.image_files = self.image_files[:count]
+            else:
+                t = len(self.image_files)
+                for i in range(count-len(self.image_files)):
+                    self.image_files.append(random.choice(self.image_files[:t]))
+        self.image_files.sort(key=lambda y: y.lower())
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        return image
+    def __len__(self):
+        return len(self.image_files)
 
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
@@ -377,12 +401,29 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         
+        if P.dataset=="cifar10":
+            fake_transform = transforms.Compose([
+                transforms.Resize((256,256)),
+                transforms.CenterCrop((image_size[0], image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            fake_root='./CIFAR10-Fake/'
+            fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
+            if sum(fc) != fake_count:
+                fc[0] += abs(fake_count - sum(fc))
+            train_ds_cifar10_fake = []
+            for i in range(len(cls_list)):
+                train_ds_cifar10_fake.append(FakeCIFAR10(root=fake_root, category=cls_list[i], transform=fake_transform, count=fc[i]))
+            train_ds_cifar10_fake = torch.utils.data.ConcatDataset(train_ds_cifar10_fake)
+            print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure, train_ds_cifar10_fake])
+        else:
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
+        
         if len(cutpast_train_set) > 0:
             print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
-        
         print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
-
-        exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     return train_loader
