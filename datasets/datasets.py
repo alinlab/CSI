@@ -342,7 +342,7 @@ class FakeMNIST(Dataset):
         self.transform = transform
         self.image_files = []
         for i in range(len(category)):
-            img_files = list(np.load("./Fake_Mnist.npy")[6000*category:6000*(category+1)])
+            img_files = list(np.load("./Fake_Mnist.npy")[6000*i:6000*(i+1)])
             if count[i]<len(img_files):
                 img_files = img_files[:count[i]]
             else:
