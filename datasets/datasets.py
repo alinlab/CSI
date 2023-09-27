@@ -350,7 +350,7 @@ class FakeMNIST(Dataset):
                 for i in range(count[i]-t):
                     img_files.append(random.choice(img_files[:t]))            
             self.image_files += img_files
-        self.image_files.sort(key=lambda y: y.lower())
+        # self.image_files.sort(key=lambda y: y.lower())
 
     def __getitem__(self, index):
         image = Image.fromarray((self.image_files[index].transpose(1, 2, 0)*255).astype(np.uint8))
