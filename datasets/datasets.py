@@ -261,7 +261,7 @@ class MVTecDataset_Cutpasted(Dataset):
                 self.image_files = self.image_files[:count]
             else:
                 t = len(self.image_files)
-                for i in range(count-len(self.image_files[:t])):
+                for i in range(count-t):
                     self.image_files.append(random.choice(self.image_files[:t]))
         self.image_files.sort(key=lambda y: y.lower())
         self.train = train
@@ -676,7 +676,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
     elif len(dataset)>count:
         unique_numbers = []
         while len(unique_numbers) < count:
-            number = random.randint(1, len(dataset))
+            number = random.randint(0, len(dataset)-1)
             if number not in unique_numbers:
                 unique_numbers.append(number)
         dataset = Subset(dataset, unique_numbers)
@@ -686,7 +686,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
         trnsets = [dataset for i in range(num)]
         unique_numbers = []
         while len(unique_numbers) < remainding:
-            number = random.randint(1, len(dataset))
+            number = random.randint(0, len(dataset)-1)
             if number not in unique_numbers:
                 unique_numbers.append(number)
         dataset = Subset(dataset, unique_numbers)
