@@ -421,7 +421,6 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.ToTensor(),
         ])
         '''
-
         train_transform = transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
@@ -439,7 +438,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         labels_df = pd.read_csv('./head-ct/labels.csv')
         labels = np.array(labels_df[' hemorrhage'].tolist())
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
-
+        np.random.seed(45)
         indicies = np.random.permutation(100)
         train_true_idx, test_true_idx = indicies[:75], indicies[75:]
         train_false_idx, test_false_idx = indicies[:75] + 100, indicies[75:] + 100
