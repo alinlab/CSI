@@ -38,7 +38,6 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, train_exposu
     for n, (images, labels) in enumerate(loader):
         try:
             exposure_images, _ = next(train_exposure_loader_iterator)
-            print("wwwwwwwwwwwwwwwwwwwwww: ", exposure_images.shape)
         except StopIteration:
             train_exposure_loader_iterator = iter(train_exposure_loader)
             exposure_images, _ = next(train_exposure_loader_iterator)
