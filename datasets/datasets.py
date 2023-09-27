@@ -326,6 +326,7 @@ class FakeCIFAR10(Dataset):
                     img_files.append(random.choice(img_files[:t]))            
             self.image_files += img_files
         self.image_files.sort(key=lambda y: y.lower())
+        print(len(self.image_files), self.image_files)
 
     def __getitem__(self, index):
         image_file = self.image_files[index]
