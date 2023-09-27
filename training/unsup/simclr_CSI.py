@@ -37,10 +37,10 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, train_exposu
 
     for n, (images, labels) in enumerate(loader):
         try:
-            exposure_images = next(train_exposure_loader_iterator)
+            exposure_images, _ = next(train_exposure_loader_iterator)
         except StopIteration:
             train_exposure_loader_iterator = iter(train_exposure_loader)
-            exposure_images = next(train_exposure_loader_iterator)
+            exposure_images, _ = next(train_exposure_loader_iterator)
         # print(exposure_images.shape, images.shape, labels.shape)
         model.train()
         count = n * P.n_gpus  # number of trained samples

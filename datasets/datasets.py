@@ -154,7 +154,7 @@ class ImageNetExposure(Dataset):
         image = image.convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-        return image
+        return image, -1
 
     def __len__(self):
         return len(self.image_files)
@@ -241,7 +241,7 @@ class FakeMVTecDataset(Dataset):
         image = image.convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-        return image
+        return image, -1
     def __len__(self):
         return len(self.image_files)
 
@@ -271,7 +271,7 @@ class MVTecDataset_Cutpasted(Dataset):
         image = image.convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-        return image
+        return image, -1
 
     def __len__(self):
         return len(self.image_files)
@@ -333,7 +333,7 @@ class FakeCIFAR10(Dataset):
         image = image.convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-        return image
+        return image, -1
     def __len__(self):
         return len(self.image_files)
 
@@ -399,7 +399,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             else:
                 cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
         cutpast_train_set.transform = train_transform_cutpasted
-        cutpast_train_set = DataOnlyDataset(cutpast_train_set)
+        # cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
             fake_transform = transforms.Compose([
@@ -414,8 +414,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 fc[0] += abs(fake_count - sum(fc))            
             train_ds_cifar10_fake = FakeCIFAR10(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
             print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
-            temp = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake])
-            exposureset = torch.utils.data.ConcatDataset([imagenet_exposure, temp])
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         
