@@ -413,7 +413,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if sum(fc) != fake_count:
                 fc[0] += abs(fake_count - sum(fc))            
             train_ds_cifar10_fake = FakeCIFAR10(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
-            print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
+            if len(train_ds_cifar10_fake) > 0:
+                print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
