@@ -403,8 +403,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
             fake_transform = transforms.Compose([
-                transforms.Resize((256,256)),
-                transforms.CenterCrop((image_size[0], image_size[1])),
+                transforms.Resize((image_size[0],image_size[1])),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
             ])
