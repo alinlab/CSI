@@ -32,8 +32,9 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, train_exposu
     losses['shift'] = AverageMeter()
 
     check = time.time()
-    print("len(train_exposure_loader_iterator), len(loader): ", len(train_exposure_loader_iterator), len(loader))
     train_exposure_loader_iterator = iter(train_exposure_loader)
+    print("len(train_exposure_loader_iterator), len(loader): ", len(train_exposure_loader_iterator), len(loader))
+
     for n, (images, labels) in enumerate(loader):
         try:
             exposure_images = next(train_exposure_loader_iterator)
