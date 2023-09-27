@@ -400,7 +400,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         cutpast_train_set.transform = train_transform_cutpasted
         cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
-        
+        print("tiny_count", tiny_count, len(imagenet_exposure))
         if P.dataset=="cifar10":
             fake_transform = transforms.Compose([
                 transforms.Resize((256,256)),
@@ -479,7 +479,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         labels_df = pd.read_csv('./head-ct/labels.csv')
         labels = np.array(labels_df[' hemorrhage'].tolist())
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
-        np.random.seed(45)
+        np.random.seed  (1225)
         indicies = np.random.permutation(100)
         train_true_idx, test_true_idx = indicies[:75], indicies[75:]
         train_false_idx, test_false_idx = indicies[:75] + 100, indicies[75:] + 100
