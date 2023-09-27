@@ -424,7 +424,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
 
         train_transform = transforms.Compose([
             transforms.Resize(256),
-            transforms.RandomResizedCrop(224),
+            transforms.CenterCrop(224),
             transforms.Grayscale(num_output_channels=1),
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
