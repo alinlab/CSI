@@ -316,14 +316,15 @@ class FakeCIFAR10(Dataset):
     def __init__(self, root, category, transform=None, target_transform=None, train=True, count=None):
         self.transform = transform
         self.image_files = []
-        self.image_files = glob(os.path.join(root, str(category), "*.jpeg"))
-        if count:
-            if count<len(self.image_files):
-                self.image_files = self.image_files[:count]
+        for i in range(len(category)):
+            img_files = glob(os.path.join(root, str(category[i]), "*.jpeg"))
+            if count[i]<len(img_files):
+                img_files = img_files[:count[i]]
             else:
-                t = len(self.image_files)
-                for i in range(count-len(self.image_files)):
-                    self.image_files.append(random.choice(self.image_files[:t]))
+                t = len(img_files)
+                for i in range(count[i]-t):
+                    img_files.append(random.choice(img_files[:t]))            
+            self.image_files += img_files
         self.image_files.sort(key=lambda y: y.lower())
 
     def __getitem__(self, index):
@@ -410,11 +411,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             fake_root='./CIFAR10-Fake/'
             fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
             if sum(fc) != fake_count:
-                fc[0] += abs(fake_count - sum(fc))
-            train_ds_cifar10_fake = []
-            for i in range(len(cls_list)):
-                train_ds_cifar10_fake.append(FakeCIFAR10(root=fake_root, category=cls_list[i], transform=fake_transform, count=fc[i]))
-            train_ds_cifar10_fake = torch.utils.data.ConcatDataset(train_ds_cifar10_fake)
+                fc[0] += abs(fake_count - sum(fc))            
+            train_ds_cifar10_fake = FakeCIFAR10(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
             print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([imagenet_exposure, cutpast_train_set, train_ds_cifar10_fake])
         else:
