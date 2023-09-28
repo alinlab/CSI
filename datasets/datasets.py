@@ -549,6 +549,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
         classes = [classes]
 
     indices = []
+    print("lennnnnn: ", len(dataset))
     try:
         for idx, tgt in enumerate(dataset.targets):
             if tgt in classes:
@@ -560,6 +561,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
                 indices.append(idx)
     
     dataset = Subset(dataset, indices)
+    print("lennnnnn 2222222: ", len(dataset))
     if count==-1:
         pass
     elif len(dataset)>count:
