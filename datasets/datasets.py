@@ -209,9 +209,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         else:
             if P.high_var:
                 print("cls_list", cls_list)
-                cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list, count=cutpast_count)
+                cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list, count=cutpast_count)
             else:
-                cutpast_train_set = get_subclass_dataset(cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
+                cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
         cutpast_train_set.transform = train_transform_cutpasted
         # cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
@@ -281,6 +281,7 @@ def get_breastmnist_test(normal_class_indx, path, transform):
     # load the data
     train_dataset = DataClass(split='train', transform=transform, download=download)
     test_dataset = DataClass(split='test', transform=transform, download=download)
+    '''
     classes = [normal_class_indx]
     normal_indices = []
     for idx, (_, tgt) in enumerate(test_dataset):
@@ -291,6 +292,7 @@ def get_breastmnist_test(normal_class_indx, path, transform):
         test_dataset.labels[i] = 1
     for i in normal_indices:
         test_dataset.labels[i] = 0
+    '''
     return test_dataset
     
 
@@ -303,6 +305,7 @@ def get_breastmnist_train(anomaly_class_indx, path, transform):
     n_classes = len(info['label'])
     DataClass = getattr(medmnist, info['python_class'])
     train_dataset = DataClass(split='train', transform=transform, download=download)
+    '''
     classes = [anomaly_class_indx]
     normal_indices = []
 
@@ -314,6 +317,7 @@ def get_breastmnist_train(anomaly_class_indx, path, transform):
         train_dataset.labels[i] = 0
 
     train_dataset = Subset(train_dataset, normal_indices)
+    '''
     return train_dataset
 
 
@@ -545,7 +549,7 @@ def get_superclass_list(dataset):
         raise NotImplementedError()
 
 
-def get_subclass_dataset(dataset, classes, count=-1):
+def get_subclass_dataset(P, dataset, classes, count=-1):
     if not isinstance(classes, list):
         classes = [classes]
 
@@ -557,12 +561,9 @@ def get_subclass_dataset(dataset, classes, count=-1):
     except:
         # SVHN
         for idx, (_, tgt) in enumerate(dataset):
-            print(tgt)
             if tgt in classes:
                 indices.append(idx)
-    print(len(indices), len(dataset))         
-    if len(indices)==0:
-        return dataset
+   
 
     dataset = Subset(dataset, indices)
     if count==-1:

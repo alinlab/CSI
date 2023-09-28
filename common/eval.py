@@ -47,14 +47,14 @@ if P.one_class_idx is not None:
             print("erorr: These datasets are not proper for high_var settings!")
             raise Exception()
         del cls_list[P.one_class_idx]
-        train_set = get_subclass_dataset(train_set, classes=cls_list, count=P.main_count)
-        test_set = get_subclass_dataset(test_set, classes=cls_list)
+        train_set = get_subclass_dataset(P,train_set, classes=cls_list, count=P.main_count)
+        test_set = get_subclass_dataset(P,test_set, classes=cls_list)
     else:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
-            test_set = get_subclass_dataset(test_set, classes=0)
+            test_set = get_subclass_dataset(P,test_set, classes=0)
         else:
-            train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
-            test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+            train_set = get_subclass_dataset(P,train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
+            test_set = get_subclass_dataset(P,test_set, classes=cls_list[P.one_class_idx])
 
 print("normal test set:", len(test_set))
 kwargs = {'pin_memory': False, 'num_workers': 4}
@@ -100,7 +100,7 @@ for ood in P.ood_dataset:
         continue
 
     if P.one_class_idx is not None:
-        ood_test_set = get_subclass_dataset(full_test_set, classes=P.one_class_idx)
+        ood_test_set = get_subclass_dataset(P,full_test_set, classes=P.one_class_idx)
         ood = f'one_class_{ood}'  # change save name
     else:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, eval=ood_eval, download=True)

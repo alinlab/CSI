@@ -40,7 +40,7 @@ for remove_idx in remove_idx_list:
 set_random_seed(0)
 train_dir = os.path.join(IMAGENET_PATH, 'one_class_train')
 Imagenet_set = datasets.ImageFolder(train_dir, transform=transform)
-Imagenet_set = get_subclass_dataset(Imagenet_set, class_idx_list)
+Imagenet_set = get_subclass_dataset(P, Imagenet_set, class_idx_list)
 Imagenet_dataloader = DataLoader(Imagenet_set, batch_size=100, shuffle=True, pin_memory=False)
 
 total_test_image = None
