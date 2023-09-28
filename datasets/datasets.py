@@ -560,7 +560,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
             if tgt in classes:
                 indices.append(idx)
     print(len(indices), len(dataset))         
-    if len(indices)==len(dataset):
+    if len(indices)==0:
         return dataset
 
     dataset = Subset(dataset, indices)
