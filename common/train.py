@@ -120,12 +120,14 @@ for ood in P.ood_dataset:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, download=True)
     print(f"testset anomaly(class {ood}):", len(ood_test_set))
     ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
-
-    unique_labels = set()
-    for _, labels in ood_test_loader[ood]:
-        unique_labels.update(labels.tolist())
-    unique_labels = sorted(list(unique_labels))
-    print("Unique labels(ood_test_loader):", unique_labels)
+    try:
+        unique_labels = set()
+        for _, labels in ood_test_loader[ood]:
+            unique_labels.update(labels.tolist())
+        unique_labels = sorted(list(unique_labels))
+        print("Unique labels(ood_test_loader):", unique_labels)
+    except:
+        pass
 
 train_exposure_loader = get_exposure_dataloader(P=P, batch_size=P.batch_size, count=len(train_set), image_size=image_size_, cls_list=cls_list)
 print("exposure loader batches, train loader batchs", len(train_exposure_loader), len(train_loader))
