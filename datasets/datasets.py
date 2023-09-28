@@ -143,7 +143,7 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size=
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
-    if P.dataset=='head-ct' or P.dataset=='breastmnist':
+    if P.dataset=='head-ct' or P.dataset=='breastmnist' or  P.dataset=='mnist' or P.dataset=='fashion-mnist':
         tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.Grayscale(num_output_channels=1),
@@ -163,8 +163,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
     fake_count = int(P.fake_data_percent*count)
     tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
     cutpast_count = int(P.cutpast_data_percent*count)
-    print("fake_count, tiny_count, cutpast_count", fake_count, tiny_count, cutpast_count)
-
     if (fake_count+tiny_count+cutpast_count)!=count:
         tiny_count += (count - (cutpast_count+fake_count+tiny_count))
     print("fake_count, tiny_count, cutpast_count", fake_count, tiny_count, cutpast_count)
@@ -193,7 +191,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     else:
-        if P.dataset=='head-ct' or P.dataset=='breastmnist':
+        if P.dataset=='head-ct' or P.dataset=='breastmnist' or P.dataset=='mnist' or P.dataset=='fashion-mnist':
             train_transform_cutpasted = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.Grayscale(num_output_channels=1),
