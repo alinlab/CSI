@@ -165,7 +165,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
     cutpast_count = int(P.cutpast_data_percent*count)
     if (fake_count+tiny_count+cutpast_count)!=count:
         tiny_count += (count - (cutpast_count+fake_count+tiny_count))
-
+    print("fake_count, tiny_count, cutpast_count", fake_count, tiny_count, cutpast_count)
     if P.dataset == "MVTecAD":
         fake_transform = transforms.Compose([
             transforms.Resize((256,256)),
@@ -279,7 +279,6 @@ def get_breastmnist_test(normal_class_indx, path, transform):
     DataClass = getattr(medmnist, info['python_class'])
 
     # load the data
-    train_dataset = DataClass(split='train', transform=transform, download=download)
     test_dataset = DataClass(split='test', transform=transform, download=download)
 
     test_dataset.labels = test_dataset.labels.squeeze()
@@ -308,7 +307,6 @@ def get_breastmnist_train(anomaly_class_indx, path, transform):
     n_classes = len(info['label'])
     DataClass = getattr(medmnist, info['python_class'])
     train_dataset = DataClass(split='train', transform=transform, download=download)
-
     train_dataset.labels = train_dataset.labels.squeeze()
 
     '''
@@ -341,7 +339,6 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
     if dataset == 'cifar10':
         # image_size = (32, 32, 3)
         n_classes = 10
-        
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
