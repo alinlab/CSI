@@ -64,18 +64,19 @@ train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kw
 test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
 
-
-unique_labels = set()
-for _, labels in test_loader:
-    unique_labels.update(labels.tolist())
-unique_labels = sorted(list(unique_labels))
-print("Unique labels(test_loader):", unique_labels)
-unique_labels = set()
-for _, labels in train_loader:
-    unique_labels.update(labels.tolist())
-unique_labels = sorted(list(unique_labels))
-print("Unique labels(train_loader):", unique_labels)
-
+try:
+    unique_labels = set()
+    for _, labels in test_loader:
+        unique_labels.update(labels.tolist())
+    unique_labels = sorted(list(unique_labels))
+    print("Unique labels(test_loader):", unique_labels)
+    unique_labels = set()
+    for _, labels in train_loader:
+        unique_labels.update(labels.tolist())
+    unique_labels = sorted(list(unique_labels))
+    print("Unique labels(train_loader):", unique_labels)
+except:
+    pass
 
 
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
@@ -107,11 +108,13 @@ for ood in P.ood_dataset:
     print(f"testset anomaly(class {ood}):", len(ood_test_set))
     # main_OOD_dataset.append(deepcopy(ood_test_set))
     ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
-    
-    unique_labels = set()
-    for _, labels in ood_test_loader[ood]:
-        unique_labels.update(labels.tolist())
-    unique_labels = sorted(list(unique_labels))
+    try:
+        unique_labels = set()
+        for _, labels in ood_test_loader[ood]:
+            unique_labels.update(labels.tolist())
+        unique_labels = sorted(list(unique_labels))
+    except:
+        pass
     print("Unique labels(ood_test_loader):", unique_labels)
 #_main_OOD_dataset_ = torch.utils.data.ConcatDataset(main_OOD_dataset)
 # ood_test_loader["One-Versus-All"] = DataLoader(_main_OOD_dataset_, shuffle=False, batch_size=P.test_batch_size, **kwargs)
