@@ -557,6 +557,7 @@ def get_subclass_dataset(dataset, classes, count=-1):
     except:
         # SVHN
         for idx, (_, tgt) in enumerate(dataset):
+            print(tgt)
             if tgt in classes:
                 indices.append(idx)
     print(len(indices), len(dataset))         
