@@ -282,7 +282,7 @@ def get_breastmnist_test(normal_class_indx, path, transform):
     train_dataset = DataClass(split='train', transform=transform, download=download)
     test_dataset = DataClass(split='test', transform=transform, download=download)
 
-    train_dataset.labels = train_dataset.labels.squeeze()
+    test_dataset.labels = test_dataset.labels.squeeze()
 
     '''
     classes = [normal_class_indx]
