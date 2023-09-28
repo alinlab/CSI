@@ -375,6 +375,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         n_classes = 2
         transform = transforms.Compose([
             transforms.Resize((image_size[0], image_size[1])),
+            transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
         test_set = get_breastmnist_test(normal_class_indx=P.one_class_idx, path='./data/', transform=transform)
