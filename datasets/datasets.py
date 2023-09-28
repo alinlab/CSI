@@ -281,6 +281,9 @@ def get_breastmnist_test(normal_class_indx, path, transform):
     # load the data
     train_dataset = DataClass(split='train', transform=transform, download=download)
     test_dataset = DataClass(split='test', transform=transform, download=download)
+
+    train_dataset.labels = train_dataset.labels.squeeze()
+
     '''
     classes = [normal_class_indx]
     normal_indices = []
@@ -305,6 +308,9 @@ def get_breastmnist_train(anomaly_class_indx, path, transform):
     n_classes = len(info['label'])
     DataClass = getattr(medmnist, info['python_class'])
     train_dataset = DataClass(split='train', transform=transform, download=download)
+
+    train_dataset.labels = train_dataset.labels.squeeze()
+
     '''
     classes = [anomaly_class_indx]
     normal_indices = []
