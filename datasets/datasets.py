@@ -16,7 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import cv2
-from dataset.custom_datasets import *
+from datasets.custom_datasets import *
 
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
@@ -215,7 +215,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_cifar10_fake) > 0:
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
-        elif P.dataset=="cifar10" or P.dataset=="mnist":
+        elif P.dataset=="mnist":
             fake_transform = transforms.Compose([
                 transforms.Resize((image_size[0],image_size[1])),
                 transforms.RandomHorizontalFlip(),
@@ -229,6 +229,20 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_mnist_fake) > 0:
                 print("number of fake data:", len(train_ds_mnist_fake), "shape:", train_ds_mnist_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_mnist_fake, imagenet_exposure])
+        elif P.dataset=="fashion-mnist":
+            fake_transform = transforms.Compose([
+                transforms.Resize((image_size[0],image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
+            if sum(fc) != fake_count:
+                fc[0] += abs(fake_count - sum(fc))
+            fake_root='./Fashion-Fake/'
+            train_ds_fmnist_fake = FakeFashionDataset(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
+            if len(train_ds_fmnist_fake) > 0:
+                print("number of fake data:", len(train_ds_fmnist_fake), "shape:", train_ds_fmnist_fake[0][0].shape)
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_fmnist_fake, imagenet_exposure])
             
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
