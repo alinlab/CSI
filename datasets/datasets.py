@@ -163,6 +163,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
     fake_count = int(P.fake_data_percent*count)
     tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
     cutpast_count = int(P.cutpast_data_percent*count)
+    print("fake_count, tiny_count, cutpast_count", fake_count, tiny_count, cutpast_count)
+
     if (fake_count+tiny_count+cutpast_count)!=count:
         tiny_count += (count - (cutpast_count+fake_count+tiny_count))
     print("fake_count, tiny_count, cutpast_count", fake_count, tiny_count, cutpast_count)
