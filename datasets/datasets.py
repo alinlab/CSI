@@ -561,10 +561,9 @@ def get_subclass_dataset(dataset, classes, count=-1):
         print("2222222222: ", len(dataset))
 
         for idx, (_, tgt) in enumerate(dataset):
-            print(tgt)
             if tgt in classes:
                 indices.append(idx)
-    
+    print(indices)
     dataset = Subset(dataset, indices)
     print("lennnnnn 2222222: ", len(dataset))
     if count==-1:
