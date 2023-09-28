@@ -549,24 +549,21 @@ def get_subclass_dataset(dataset, classes, count=-1):
         classes = [classes]
 
     indices = []
-    print("lennnnnn: ", len(dataset))
-    try:
-        print("111111: ", len(dataset))
-        
+    try:        
         for idx, tgt in enumerate(dataset.targets):
             if tgt in classes:
                 indices.append(idx)
     except:
         # SVHN
-        print("2222222222: ", len(dataset))
-        print(classes)
         for idx, (_, tgt) in enumerate(dataset):
             print(tgt)
             if tgt in classes:
                 indices.append(idx)
-    print(indices)
+                
+    if len(indices)==len(dataset):
+        return dataset
+
     dataset = Subset(dataset, indices)
-    print("lennnnnn 2222222: ", len(dataset))
     if count==-1:
         pass
     elif len(dataset)>count:
