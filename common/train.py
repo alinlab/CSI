@@ -79,18 +79,19 @@ train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kw
 test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
 
-
-unique_labels = set()
-for _, labels in test_loader:
-    unique_labels.update(labels.tolist())
-unique_labels = sorted(list(unique_labels))
-print("Unique labels(test_loader):", unique_labels)
-unique_labels = set()
-for _, labels in train_loader:
-    unique_labels.update(labels.tolist())
-unique_labels = sorted(list(unique_labels))
-print("Unique labels(train_loader):", unique_labels)
-
+try:
+    unique_labels = set()
+    for _, labels in test_loader:
+        unique_labels.update(labels.tolist())
+    unique_labels = sorted(list(unique_labels))
+    print("Unique labels(test_loader):", unique_labels)
+    unique_labels = set()
+    for _, labels in train_loader:
+        unique_labels.update(labels.tolist())
+    unique_labels = sorted(list(unique_labels))
+    print("Unique labels(train_loader):", unique_labels)
+except:
+    pass
 
 
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
