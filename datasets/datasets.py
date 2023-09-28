@@ -18,6 +18,9 @@ import seaborn as sns
 import cv2
 from datasets.custom_datasets import *
 
+import medmnist
+from medmnist import INFO, Evaluator
+
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
 
@@ -140,12 +143,23 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size=
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                             base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
-    tiny_transform = transforms.Compose([
+    if P.dataset=='head-ct' or P.dataset=='breastmnist':
+        tiny_transform = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.Grayscale(num_output_channels=3),
+                transforms.AutoAugment(),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+        ]) 
+    else:
+        tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.AutoAugment(),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
         ])
+
     fake_count = int(P.fake_data_percent*count)
     tiny_count = int((1-(P.fake_data_percent+P.cutpast_data_percent))*count)
     cutpast_count = int(P.cutpast_data_percent*count)
@@ -177,7 +191,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     else:
-        if P.dataset=='head-ct':
+        if P.dataset=='head-ct' or P.dataset=='breastmnist':
             train_transform_cutpasted = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.Grayscale(num_output_channels=1),
@@ -243,7 +257,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_fmnist_fake) > 0:
                 print("number of fake data:", len(train_ds_fmnist_fake), "shape:", train_ds_fmnist_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_fmnist_fake, imagenet_exposure])
-            
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         
@@ -253,6 +266,56 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
     return train_loader
+
+
+def get_breastmnist_test(normal_class_indx, path, transform):
+    data_flag = 'breastmnist'
+    BATCH_SIZE = 64
+    download = True
+    info = INFO[data_flag]
+    task = info['task']
+    n_channels = info['n_channels']
+    n_classes = len(info['label'])
+    DataClass = getattr(medmnist, info['python_class'])
+
+    # load the data
+    train_dataset = DataClass(split='train', transform=transform, download=download)
+    test_dataset = DataClass(split='test', transform=transform, download=download)
+    classes = [normal_class_indx]
+    normal_indices = []
+    for idx, (_, tgt) in enumerate(test_dataset):
+        if tgt in classes:
+            normal_indices.append(idx)
+    anomaly_indices = [i for i in range(len(test_dataset)) if i not in normal_indices]
+    for i in anomaly_indices:
+        test_dataset.labels[i] = 1
+    for i in normal_indices:
+        test_dataset.labels[i] = 0
+    return test_dataset
+    
+
+def get_breastmnist_train(anomaly_class_indx, path, transform):
+    data_flag = 'breastmnist'
+    download = True
+    info = INFO[data_flag]
+    task = info['task']
+    n_channels = info['n_channels']
+    n_classes = len(info['label'])
+    DataClass = getattr(medmnist, info['python_class'])
+    train_dataset = DataClass(split='train', transform=transform, download=download)
+    classes = [anomaly_class_indx]
+    normal_indices = []
+
+    for idx, (_, tgt) in enumerate(train_dataset):
+        if tgt in classes:
+            normal_indices.append(idx)
+
+    for i in normal_indices:
+        train_dataset.labels[i] = 0
+
+    train_dataset = Subset(train_dataset, normal_indices)
+    return train_dataset
+
 
 def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False):
     if dataset in ['imagenet', 'cub', 'stanford_dogs', 'flowers102',
@@ -275,19 +338,6 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'head-ct':
         n_classes = 2
-        
-        '''
-        train_transform = transforms.Compose([
-            transforms.Resize(256),
-            transforms.RandomResizedCrop(224),
-            transforms.ToTensor(),
-        ])
-        test_transform = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-        ])
-        '''
         train_transform = transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
@@ -321,7 +371,15 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         test_set = HEAD_CT_DATASET(image_path=test_image, labels=test_label, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
-
+    elif dataset == 'breastmnist':
+        transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+        test_set = get_breastmnist_test(normal_class_indx=P.one_class_idx, path='./data/', transform=transform)
+        train_set = get_breastmnist_train(anomaly_class_indx=P.one_class_idx, path='./data/', transform=transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'fashion-mnist':
         # image_size = (32, 32, 3)
         n_classes = 10
