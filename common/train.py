@@ -115,7 +115,7 @@ for ood in P.ood_dataset:
         continue
 
     if P.one_class_idx is not None:
-        ood_test_set = get_subclass_dataset(P, full_test_set, classes=P.one_class_idx)
+        ood_test_set = get_subclass_dataset(P, full_test_set, classes=ood)
         ood = f'one_class_{ood}'  # change save name
     else:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, download=True)
@@ -124,8 +124,7 @@ for ood in P.ood_dataset:
     try:
         unique_labels = set()
         for _, labels in ood_test_loader[ood]:
-            print(labels)
-            break
+            unique_labels.update(labels.tolist())
         unique_labels = sorted(list(unique_labels))
         print("Unique labels(ood_test_loader):", unique_labels)
     except:
