@@ -196,6 +196,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.Grayscale(num_output_channels=1),
                 transforms.Grayscale(num_output_channels=3),
+                transforms.RandomRotation((90, 270)),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
         else:
