@@ -108,6 +108,7 @@ if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
 if P.dataset=="MVTecAD":
     P.ood_dataset = [1]
 ood_test_loader = dict()
+print("P.ood_dataset",  P.ood_dataset)
 for ood in P.ood_dataset:
     if ood == 'interp':
         ood_test_loader[ood] = None  # dummy loader
