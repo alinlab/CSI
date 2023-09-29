@@ -37,7 +37,7 @@ for epoch in range(start_epoch, P.epochs + 1):
     kwargs['simclr_aug'] = simclr_aug
 
     
-    if epoch > 6:
+    if epoch > 50:
         for param in model.parameters():
             param.requires_grad = True
 

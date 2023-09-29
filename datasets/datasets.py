@@ -230,6 +230,21 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_cifar10_fake) > 0:
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
+        if P.dataset=="svhn-10":
+            fake_transform = transforms.Compose([
+                transforms.Resize((image_size[0],image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            fake_root='./SVHN-Fake/'
+            fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
+            if sum(fc) != fake_count:
+                fc[0] += abs(fake_count - sum(fc))            
+            train_ds_svhn_fake = Fake_SVHN_Dataset(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
+            if len(train_ds_svhn_fake) > 0:
+                print("number of fake data:", len(train_ds_svhn_fake), "shape:", train_ds_svhn_fake[0][0].shape)
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_svhn_fake, imagenet_exposure])
+        
         elif P.dataset=="mnist":
             fake_transform = transforms.Compose([
                 transforms.Resize((image_size[0],image_size[1])),

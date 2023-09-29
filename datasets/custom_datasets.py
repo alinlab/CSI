@@ -268,3 +268,29 @@ class FakeFashionDataset(Dataset):
         return image, -1
     def __len__(self):
         return len(self.image_files)
+
+class Fake_SVHN_Dataset(Dataset):
+    def __init__(self, root, category, transform=None, target_transform=None, train=True, count=None):
+        self.transform = transform
+        self.image_files = []
+        for i in range(len(category)):
+            img_files = glob(os.path.join(root, str(category[i]), "*.jpeg"))
+            if count[i]<len(img_files):
+                img_files = img_files[:count[i]]
+            else:
+                t = len(img_files)
+                for i in range(count[i]-t):
+                    img_files.append(random.choice(img_files[:t]))            
+            self.image_files += img_files
+        self.image_files.sort(key=lambda y: y.lower())
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        if self.transform is not None:
+            image = self.transform(image)
+        target = 1
+        return image, target
+    def __len__(self):
+        return len(self.image_files)
