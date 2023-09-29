@@ -101,7 +101,7 @@ for ood in P.ood_dataset:
         continue
 
     if P.one_class_idx is not None:
-        ood_test_set = get_subclass_dataset(P,full_test_set, classes=P.one_class_idx)
+        ood_test_set = get_subclass_dataset(P,full_test_set, classes=ood)
         ood = f'one_class_{ood}'  # change save name
     else:
         ood_test_set = get_dataset(P, dataset=ood, test_only=True, image_size=P.image_size, eval=ood_eval, download=True)
