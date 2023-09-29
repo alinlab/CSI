@@ -123,7 +123,8 @@ for ood in P.ood_dataset:
     try:
         unique_labels = set()
         for _, labels in ood_test_loader[ood]:
-            unique_labels.update(labels.tolist())
+            print(labels)
+            break
         unique_labels = sorted(list(unique_labels))
         print("Unique labels(ood_test_loader):", unique_labels)
     except:
