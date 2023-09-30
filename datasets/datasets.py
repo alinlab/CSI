@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import cv2
 from datasets.custom_datasets import *
+from torch.utils.data import ConcatDataset
 
 import medmnist
 from medmnist import INFO, Evaluator
@@ -32,6 +33,7 @@ SVHN_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))
 MVTecAD_SUPERCLASS = list(range(2))
 HEAD_CT_SUPERCLASS = list(range(2))
+MVTEC_HV_SUPERCLASS = list(range(2))
 breastmnist_SUPERCLASS = list(range(2))
 CIFAR100_SUPERCLASS = [
     [4, 31, 55, 72, 95],
@@ -56,6 +58,7 @@ CIFAR100_SUPERCLASS = [
     [41, 69, 81, 85, 89],
 ]
 
+CLASS_NAMES = ["bottle","cable","capsule","carpet","grid","hazelnut","leather","metal_nut","pill","screw","tile","toothbrush","transistor","wood","zipper",]
 
 def get_transform(image_size=None):
     # Note: data augmentation is implemented in the layers
@@ -413,6 +416,22 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         train_set = get_breastmnist_train(anomaly_class_indx=P.one_class_idx, path='./data/', transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
+    
+    elif dataset == 'mvtec-high-var':
+        train_dataset = []
+        test_dataset = []
+        labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+        for class_idx in labels:
+            train_dataset.append(MVTecDataset('./', class_name=CLASS_NAMES[class_idx], is_train=True))
+            test_dataset.append(MVTecDataset('./', class_name=CLASS_NAMES[class_idx], is_train=False))
+
+        train_set = ConcatDataset(train_dataset)
+        test_set = ConcatDataset(test_dataset)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+        
+len(test_dataset), len(train_dataset)
     elif dataset == 'fashion-mnist':
         # image_size = (32, 32, 3)
         n_classes = 10
@@ -562,6 +581,8 @@ def get_superclass_list(dataset):
         return MVTecAD_SUPERCLASS
     elif dataset == 'head-ct':
         return HEAD_CT_SUPERCLASS
+    elif dataset == 'mvtec-high-var':
+        return MVTEC_HV_SUPERCLASS
     elif dataset == 'cifar10':
         return CIFAR10_SUPERCLASS
     elif dataset == 'fashion-mnist':

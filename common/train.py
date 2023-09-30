@@ -52,11 +52,14 @@ P.image_size = image_size
 P.n_classes = n_classes
 print("full test set:", len(test_set))
 
-if P.one_class_idx is not None:
+
+elif P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
-    if P.high_var:
+    if P.dataset=='mvtec-high-var':
+        test_set = get_subclass_dataset(P, test_set, classes=[0])
+    elif P.high_var:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             print("erorr: These datasets are not proper for high_var settings!")
             raise Exception()
@@ -105,7 +108,7 @@ if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
             P.ood_dataset = ['svhn', 'cifar100', 'mnist', 'imagenet', "fashion-mnist"]
     elif P.dataset == 'imagenet':
         P.ood_dataset = ['cub', 'stanford_dogs', 'flowers102']
-if P.dataset=="MVTecAD":
+if P.dataset=="MVTecAD" or P.dataset=="mvtec-high-var":
     P.ood_dataset = [1]
 ood_test_loader = dict()
 print("P.ood_dataset",  P.ood_dataset)
