@@ -238,7 +238,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_cifar10_fake) > 0:
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
-        if P.dataset=="svhn-10":
+        elif P.dataset=="svhn-10":
             fake_transform = transforms.Compose([
                 transforms.Resize((image_size[0],image_size[1])),
                 transforms.RandomHorizontalFlip(),
