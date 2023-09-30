@@ -42,7 +42,10 @@ if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
-    if P.high_var:
+    if P.dataset=='mvtec-high-var':
+        test_set = get_subclass_dataset(P, test_set, classes=[0])
+        train_set = set_dataset_count(train_set, count=P.main_count)
+    elif P.high_var:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             print("erorr: These datasets are not proper for high_var settings!")
             raise Exception()
@@ -91,7 +94,7 @@ if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     elif P.dataset == 'imagenet':
         P.ood_dataset = ['cub', 'stanford_dogs', 'flowers102', 'places365', 'food_101', 'caltech_256', 'dtd', 'pets']
 
-if P.dataset=="MVTecAD":
+if P.dataset=="MVTecAD" or P.dataset=="mvtec-high-var":
     P.ood_dataset = [1]
 ood_test_loader = dict()
 main_OOD_dataset = []
@@ -113,9 +116,9 @@ for ood in P.ood_dataset:
         for _, labels in ood_test_loader[ood]:
             unique_labels.update(labels.tolist())
         unique_labels = sorted(list(unique_labels))
+        print("Unique labels(ood_test_loader):", unique_labels)
     except:
         pass
-    print("Unique labels(ood_test_loader):", unique_labels)
 #_main_OOD_dataset_ = torch.utils.data.ConcatDataset(main_OOD_dataset)
 # ood_test_loader["One-Versus-All"] = DataLoader(_main_OOD_dataset_, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
