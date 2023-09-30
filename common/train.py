@@ -53,7 +53,7 @@ P.n_classes = n_classes
 print("full test set:", len(test_set))
 
 
-elif P.one_class_idx is not None:
+if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
     full_test_set = deepcopy(test_set)  # test set of full classes
