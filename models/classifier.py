@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from models.resnet import ResNet18, ResNet34, ResNet50, Pretrain_ResNet18_Model
+from models.resnet import ResNet18, ResNet34, ResNet50, Pretrain_ResNet18_Model, Pretrain_ResNet152_Model
 from models.resnet_imagenet import resnet18, resnet50
 import models.transform_layers as TL
 from models.vit import VIT_Pretrain
@@ -66,6 +66,8 @@ def get_classifier(mode, n_classes=10):
         classifier = VIT_Pretrain_FITYMI(num_classes=n_classes)
     elif mode == "vit":
         classifier = VIT_Pretrain(num_classes=n_classes)
+    elif mode =='pretrain-resnet152':
+        classifier = Pretrain_ResNet152_Model(num_classes=n_classes)
     elif mode =='pretrain-resnet18':
         classifier = Pretrain_ResNet18_Model(num_classes=n_classes)
     elif mode == 'resnet34':
