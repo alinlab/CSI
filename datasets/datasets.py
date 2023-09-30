@@ -422,7 +422,6 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         train_dataset = []
         test_dataset = []
         labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-
         for class_idx in labels:
             train_dataset.append(MVTecDataset('./', class_name=CLASS_NAMES[class_idx], is_train=True))
             test_dataset.append(MVTecDataset('./', class_name=CLASS_NAMES[class_idx], is_train=False))
