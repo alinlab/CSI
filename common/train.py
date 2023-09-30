@@ -59,7 +59,7 @@ if P.one_class_idx is not None:
     full_test_set = deepcopy(test_set)  # test set of full classes
     if P.dataset=='mvtec-high-var':
         test_set = get_subclass_dataset(P, test_set, classes=[0])
-        train_set = set_dataset_count(P, train_set, count=P.main_count)
+        train_set = set_dataset_count(train_set, count=P.main_count)
     elif P.high_var:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             print("erorr: These datasets are not proper for high_var settings!")
@@ -70,7 +70,7 @@ if P.one_class_idx is not None:
     else:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             test_set = get_subclass_dataset(P, test_set, classes=0)
-            train_set = set_dataset_count(P, train_set, count=P.main_count)
+            train_set = set_dataset_count(train_set, count=P.main_count)
         else:
             train_set = get_subclass_dataset(P, train_set, classes=cls_list[P.one_class_idx], count=P.main_count)
             test_set = get_subclass_dataset(P, test_set, classes=cls_list[P.one_class_idx])
