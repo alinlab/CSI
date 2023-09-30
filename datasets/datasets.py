@@ -431,7 +431,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
         
-len(test_dataset), len(train_dataset)
+        print("len(test_dataset), len(train_dataset)", len(test_dataset), len(train_dataset))
     elif dataset == 'fashion-mnist':
         # image_size = (32, 32, 3)
         n_classes = 10
