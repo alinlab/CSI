@@ -418,6 +418,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         print("test_set shapes: ", test_set[0][0].shape)
     
     elif dataset == 'mvtec-high-var':
+        n_classes = 2
         train_dataset = []
         test_dataset = []
         labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
