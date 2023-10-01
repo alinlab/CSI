@@ -58,7 +58,7 @@ CIFAR100_SUPERCLASS = [
     [41, 69, 81, 85, 89],
 ]
 
-CLASS_NAMES = ["bottle","cable","capsule","carpet","grid","hazelnut","leather","metal_nut","pill","screw","tile","toothbrush","transistor","wood","zipper",]
+CLASS_NAMES = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
 
 def get_transform(image_size=None):
     # Note: data augmentation is implemented in the layers
@@ -214,7 +214,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size, train_transform_cutpasted=train_transform_cutpasted)
-        if P.dataset=='head-ct':
+        elif P.dataset=='head-ct' or P.dataset=='mvtec-high-var':
             cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
         else:
             if P.high_var:
@@ -285,6 +285,22 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_fmnist_fake) > 0:
                 print("number of fake data:", len(train_ds_fmnist_fake), "shape:", train_ds_fmnist_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_fmnist_fake, imagenet_exposure])
+
+        elif P.dataset=="mvtec-high-var":
+            fake_root = './fake_mvtecad'
+            fake_transform = transforms.Compose([
+                transforms.Resize((256,256)),
+                transforms.CenterCrop((image_size[0], image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            train_transform_cutpasted = transforms.Compose([
+                transforms.Resize((256,256)),
+                transforms.CenterCrop((image_size[0], image_size[1])),
+                CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
+            ])
+            train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[4], transform=fake_transform, count=fake_count)
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_mvtech_fake, imagenet_exposure])
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         
