@@ -301,6 +301,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.CenterCrop((image_size[0], image_size[1])),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
+           
             train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[4], transform=fake_transform, count=fake_count)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_mvtech_fake, imagenet_exposure])
         else:
@@ -449,13 +450,24 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         train_dataset = []
         test_dataset = []
         labels = [4]
+        root = "./mvtec_anomaly_detection"
+        train_transform = transforms.Compose([
+                transforms.Resize((256, 256)),
+                transforms.CenterCrop((image_size[0], image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+            ])
         
+        test_transform = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.ToTensor(),
+            ])
         for class_idx in labels:
             if train_transform_cutpasted:
-                train_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=True, transform=train_transform_cutpasted))
+                train_dataset.append(MVTecDataset(root=root, train=True, category=CLASS_NAMES[class_idx], transform=train_transform_cutpasted, count=400))
             else:
-                train_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=True))
-            test_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=False))
+                train_dataset.append(MVTecDataset(root=root, train=True, category=CLASS_NAMES[class_idx], transform=train_transform, count=400))
+            test_dataset.append(MVTecDataset(root=root, train=False, category=CLASS_NAMES[class_idx], transform=test_transform, count=-1))
 
         train_set = ConcatDataset(train_dataset)
         test_set = ConcatDataset(test_dataset)
