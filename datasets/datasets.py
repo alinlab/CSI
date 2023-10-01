@@ -214,6 +214,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size, train_transform_cutpasted=train_transform_cutpasted)
+        print("len(cutpast_train_set) before set_count: ", len(cutpast_train_set))
         elif P.dataset=='head-ct' or P.dataset=='mvtec-high-var':
             cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
         else:
@@ -223,6 +224,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             else:
                 cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
                 cls_list = [P.one_class_idx]
+        print("len(cutpast_train_set) after set_count: ", len(cutpast_train_set))
 
         # if P.dataset!="mvtec-high-var":       
         #    cutpast_train_set.transform = train_transform_cutpasted
