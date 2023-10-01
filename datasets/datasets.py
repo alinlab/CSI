@@ -224,8 +224,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
                 cls_list = [P.one_class_idx]
 
-        if P.dataset!="mvtec-high-var":       
-            cutpast_train_set.transform = train_transform_cutpasted
+        # if P.dataset!="mvtec-high-var":       
+        #    cutpast_train_set.transform = train_transform_cutpasted
         # cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
