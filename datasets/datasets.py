@@ -367,7 +367,10 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
     if dataset == 'cifar10':
         # image_size = (32, 32, 3)
         n_classes = 10
-        train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
+        if train_transform_cutpasted:
+            train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
@@ -401,8 +404,10 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
 
         print("train_image.shape, test_image.shape: ", train_image.shape, test_image.shape)
         print("train_label.shape, test_label.shape: ", train_label.shape, test_label.shape)
-
-        train_set = HEAD_CT_DATASET(image_path=train_image, labels=train_label, transform=train_transform)
+        if train_transform_cutpasted:
+            train_set = HEAD_CT_DATASET(image_path=train_image, labels=train_label, transform=train_transform_cutpasted)
+        else:
+            train_set = HEAD_CT_DATASET(image_path=train_image, labels=train_label, transform=train_transform)
         test_set = HEAD_CT_DATASET(image_path=test_image, labels=test_label, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
@@ -414,7 +419,10 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.ToTensor(),
         ])
         test_set = get_breastmnist_test(normal_class_indx=P.one_class_idx, path='./data/', transform=transform)
-        train_set = get_breastmnist_train(anomaly_class_indx=P.one_class_idx, path='./data/', transform=transform)
+        if train_transform_cutpasted:
+            train_set = get_breastmnist_train(anomaly_class_indx=P.one_class_idx, path='./data/', transform=train_transform_cutpasted)
+        else:
+            train_set = get_breastmnist_train(anomaly_class_indx=P.one_class_idx, path='./data/', transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     
@@ -449,14 +457,20 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
-        train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
+        if train_transform_cutpasted:
+            train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'cifar100':
         # image_size = (32, 32, 3)
         n_classes = 100
-        train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform)
+        if train_transform_cutpasted:
+            train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR100(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
@@ -473,15 +487,20 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
         ])
-        
-        train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
+        if train_transform_cutpasted:
+            train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'svhn-10':
         # image_size = (32, 32, 3)
         n_classes = 10
-        train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=test_transform)
+        if train_transform_cutpasted:
+            train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=test_transform)
         test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
