@@ -53,6 +53,7 @@ for epoch in range(start_epoch, P.epochs + 1):
         P.ood_layer = ("simclr", "shift")
         P.ood_score = ["CSI"]
         P.mode  = "ood_pre"
+        P.resize_fix = True
         P.OOD_sample = 10
         P.resize_factor = 0.54
         with torch.no_grad():
@@ -63,7 +64,7 @@ for epoch in range(start_epoch, P.epochs + 1):
         P.OOD_sample = 1
         P.ood_layer = "simclr"
         P.ood_score = ['norm_mean']
-
+        P.resize_fix = False
 
         
 epoch += 1
