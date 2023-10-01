@@ -144,7 +144,7 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size=
     
 
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
-                            base_path = './tiny-imagenet-200', fake_root="./MvTechAD", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
+                            base_path = './tiny-imagenet-200', fake_root="./fake_mvtecad", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
     if P.dataset=='head-ct' or P.dataset=='breastmnist' or  P.dataset=='mnist' or P.dataset=='fashion-mnist':
         tiny_transform = transforms.Compose([
@@ -184,7 +184,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
 
         
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
-        print(fake_root, categories[P.one_class_idx])
         train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
         train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
         print("number of fake data:", len(train_ds_mvtech_fake), 'shape:', train_ds_mvtech_fake[0][0].shape)
