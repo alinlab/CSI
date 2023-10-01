@@ -46,7 +46,6 @@ for epoch in range(start_epoch, P.epochs + 1):
     model.eval()
     save_states = model.state_dict()
     save_checkpoint(epoch, save_states, optimizer.state_dict(), logger.logdir)    
-    print(P)
     if (epoch % save_step == 0) or 1==1:
         from evals.ood_pre import eval_ood_detection
         P.load_path = logger.logdir
@@ -56,6 +55,8 @@ for epoch in range(start_epoch, P.epochs + 1):
         P.resize_fix = True
         P.OOD_sample = 10
         P.resize_factor = 0.54
+        print()
+        print(P)
         with torch.no_grad():
             auroc_dict = eval_ood_detection(P, model, test_loader, ood_test_loader, P.ood_score,
                                         train_loader=train_loader, simclr_aug=simclr_aug)
