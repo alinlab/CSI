@@ -53,19 +53,19 @@ for epoch in range(start_epoch, P.epochs + 1):
         import subprocess
 
         arguments_to_pass = [
-            "--high_var", P.high_var,
-            "--image_size", {P.image_size},
+            "--high_var", str(P.high_var),
+            "--image_size", str(P.image_size),
             "--mode", "ood_pre",
-            "--dataset", P.dataset,
-            "--model", P.model,
+            "--dataset", str(P.dataset),
+            "--model", str(P.model),
             "--ood_score", "CSI",
             "--shift_trans_type", "rotation",
             "--print_score",
             "--ood_samples", "10",
-            "--resize_factor", 0.54,
+            "--resize_factor", str(0.54),
             "--resize_fix", 
-            "--one_class_idx" ,P.one_class_idx,
-            "--load_path", P.load_path
+            "--one_class_idx" , str(P.one_class_idx),
+            "--load_path", str(P.load_path)
         ]
 
         result = subprocess.run(["python", "eval.py"] + arguments_to_pass, capture_output=True, text=True)
