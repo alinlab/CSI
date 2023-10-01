@@ -304,6 +304,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
            
             train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[4], transform=fake_transform, count=fake_count)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_mvtech_fake, imagenet_exposure])
+            if len(train_ds_mvtech_fake) > 0:
+                print("number of fake data:", len(train_ds_mvtech_fake), "shape:", train_ds_mvtech_fake[0][0].shape)
+            
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         
