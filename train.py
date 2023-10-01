@@ -48,24 +48,8 @@ for epoch in range(start_epoch, P.epochs + 1):
     save_checkpoint(epoch, save_states, optimizer.state_dict(), logger.logdir)    
     if (epoch % save_step == 0) or 1==1:
         from evals.ood_pre import eval_ood_detection
-        P.load_path = logger.logdir
-        P.ood_layer = ("simclr", "shift")
-        P.ood_score = ["CSI"]
-        P.mode  = "ood_pre"
-        P.resize_fix = True
-        P.OOD_sample = 10
-        P.resize_factor = 0.54
-        print()
-        print(P)
-        with torch.no_grad():
-            auroc_dict = eval_ood_detection(P, model, test_loader, ood_test_loader, P.ood_score,
-                                        train_loader=train_loader, simclr_aug=simclr_aug)
-        P.mode  = "simclr_CSI"
-        P.resize_factor = 0.08
-        P.OOD_sample = 1
-        P.ood_layer = "simclr"
-        P.ood_score = ['norm_mean']
-        P.resize_fix = False
+        P.load_path = logger.logdir + '/last.model'
+        os.system(f'python ./eval.py --high_var {P.high_var} --cutpast_data_percent {P.cutpast_data_percent} --fake_data_percent {P.fake_data_percent} --image_size {P.image_size}  --mode ood_pre --dataset {P.dataset} --model {P.model} --ood_score CSI --shift_trans_type rotation --print_score --ood_samples 10 --resize_factor 0.54 --resize_fix --one_class_idx {P.one_class_idx} --load_path {P.load_path}')
 
         
 epoch += 1
