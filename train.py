@@ -64,8 +64,8 @@ for epoch in range(start_epoch, P.epochs + 1):
             "--ood_samples", "10",
             "--resize_factor", 0.54,
             "--resize_fix", 
-            "--one_class_idx" P.one_class_idx
-            "--load_path" P.load_path
+            "--one_class_idx" ,P.one_class_idx,
+            "--load_path", P.load_path
         ]
 
         result = subprocess.run(["python", "eval.py"] + arguments_to_pass, capture_output=True, text=True)
