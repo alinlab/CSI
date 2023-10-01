@@ -49,7 +49,8 @@ for epoch in range(start_epoch, P.epochs + 1):
     if (epoch % save_step == 0) or 1==1:
         from evals.ood_pre import eval_ood_detection
         P.load_path = logger.logdir + '/last.model'
-        os.system(f'python ./eval.py --high_var {P.high_var} --cutpast_data_percent {P.cutpast_data_percent} --fake_data_percent {P.fake_data_percent} --image_size {P.image_size}  --mode ood_pre --dataset {P.dataset} --model {P.model} --ood_score CSI --shift_trans_type rotation --print_score --ood_samples 10 --resize_factor 0.54 --resize_fix --one_class_idx {P.one_class_idx} --load_path {P.load_path}')
+        prompt = f'python ./eval.py --high_var {P.high_var} --cutpast_data_percent {P.cutpast_data_percent} --fake_data_percent {P.fake_data_percent} --image_size {P.image_size}  --mode ood_pre --dataset {P.dataset} --model {P.model} --ood_score CSI --shift_trans_type rotation --print_score --ood_samples 10 --resize_factor 0.54 --resize_fix --one_class_idx {P.one_class_idx} --load_path {P.load_path}'
+        os.system(prompt)
 
         
 epoch += 1
