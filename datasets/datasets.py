@@ -213,7 +213,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.Resize((image_size[0], image_size[1])),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
-        cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size)
+        cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size, train_transform_cutpasted=train_transform_cutpasted)
         if P.dataset=='head-ct':
             cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
         else:
@@ -223,8 +223,9 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             else:
                 cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
                 cls_list = [P.one_class_idx]
-                
-        cutpast_train_set.transform = train_transform_cutpasted
+
+        if P.dataset!="mvtec-high-var":       
+            cutpast_train_set.transform = train_transform_cutpasted
         # cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
@@ -352,7 +353,7 @@ def get_breastmnist_train(anomaly_class_indx, path, transform):
     return train_dataset
 
 
-def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False):
+def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False, train_transform_cutpasted=None):
     if dataset in ['imagenet', 'cub', 'stanford_dogs', 'flowers102',
                    'places365', 'food_101', 'caltech_256', 'dtd', 'pets']:
         if eval:
@@ -423,8 +424,11 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         test_dataset = []
         labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
         for class_idx in labels:
-            train_dataset.append(MVTecDataset('./', class_name=CLASS_NAMES[class_idx], is_train=True))
-            test_dataset.append(MVTecDataset('./', class_name=CLASS_NAMES[class_idx], is_train=False))
+            if train_transform_cutpasted:
+                train_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=True, transform=train_transform_cutpasted))
+            else:
+                train_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=True))
+            test_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=False))
 
         train_set = ConcatDataset(train_dataset)
         test_set = ConcatDataset(test_dataset)

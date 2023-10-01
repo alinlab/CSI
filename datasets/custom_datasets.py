@@ -321,7 +321,7 @@ class Fake_SVHN_Dataset(Dataset):
 
 
 
-class MVTecDataset(Dataset):
+class MVTecDataset_High_VAR(Dataset):
     def __init__(
         self,
         dataset_path="./mvtec_anomaly_detection",
@@ -329,6 +329,7 @@ class MVTecDataset(Dataset):
         is_train=True,
         resize=256,
         cropsize=224,
+        transform=None,
     ):
         assert class_name in CLASS_NAMES, "class_name: {}, should be in {}".format(
             class_name, CLASS_NAMES
@@ -346,14 +347,17 @@ class MVTecDataset(Dataset):
         
 
         # set transforms
-        self.transform_x = transforms.Compose(
-            [
-                transforms.Resize(resize, Image.ANTIALIAS),
-                transforms.CenterCrop(cropsize),
-                transforms.ToTensor(),
-                # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            ]
-        )
+        if transform:
+            self.transform_x = transform
+        else:
+            self.transform_x = transforms.Compose(
+                [
+                    transforms.Resize(resize, Image.ANTIALIAS),
+                    transforms.CenterCrop(cropsize),
+                    transforms.ToTensor(),
+                    # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                ]
+            )
         self.transform_mask = transforms.Compose(
             [transforms.Resize(resize, Image.NEAREST), transforms.CenterCrop(cropsize), transforms.ToTensor()]
         )
