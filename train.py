@@ -46,7 +46,7 @@ for epoch in range(start_epoch, P.epochs + 1):
     model.eval()
     save_states = model.state_dict()
     save_checkpoint(epoch, save_states, optimizer.state_dict(), logger.logdir)    
-    if (epoch % save_step == 0):
+    if (epoch % save_step == 0) or 1==1:
         from evals.ood_pre import eval_ood_detection
         P.load_path = logger.logdir
         P.ood_layer = ("simclr", "shift")
