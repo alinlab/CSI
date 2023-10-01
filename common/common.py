@@ -13,6 +13,8 @@ def parse_args(default=False):
                         default=None, type=int)
     parser.add_argument('--image_size', help='None: multi-class, Not None: one-class',
                         default=32, type=int)
+    parser.add_argument('--save_step', help='None: multi-class, Not None: one-class',
+                        default=20, type=int) 
     parser.add_argument('--fake_data_percent', help='',
                         default=0.0, type=float)
     parser.add_argument('--cutpast_data_percent', help='',

@@ -430,7 +430,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         n_classes = 2
         train_dataset = []
         test_dataset = []
-        labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        labels = [4]
         for class_idx in labels:
             if train_transform_cutpasted:
                 train_dataset.append(MVTecDataset_High_VAR('./', class_name=CLASS_NAMES[class_idx], is_train=True, transform=train_transform_cutpasted))

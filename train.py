@@ -21,7 +21,6 @@ else:
     linear = model.linear
 linear_optim = torch.optim.Adam(linear.parameters(), lr=1e-3, betas=(.9, .999), weight_decay=P.weight_decay)
 
-save_step = 20
 epoch = 0
 # Run experiments
 for epoch in range(start_epoch, P.epochs + 1):
@@ -46,7 +45,7 @@ for epoch in range(start_epoch, P.epochs + 1):
     model.eval()
     save_states = model.state_dict()
     save_checkpoint(epoch, save_states, optimizer.state_dict(), logger.logdir)    
-    if (epoch % save_step == 0):
+    if (epoch % P.save_step == 0):
         from evals.ood_pre import eval_ood_detection
         P.load_path = logger.logdir + '/last.model'
         import subprocess
