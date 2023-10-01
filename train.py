@@ -78,8 +78,6 @@ for epoch in range(start_epoch, P.epochs + 1):
             print("Script execution failed.")
             print("Error:")
             print(result.stderr)
-
-
         
 epoch += 1
 if P.multi_gpu:
