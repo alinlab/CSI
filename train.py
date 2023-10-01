@@ -54,7 +54,7 @@ for epoch in range(start_epoch, P.epochs + 1):
 
         arguments_to_pass = [
             "--high_var", str(P.high_var),
-            "--image_size", str(P.image_size),
+            "--image_size", str(P.image_size[0]),
             "--mode", "ood_pre",
             "--dataset", str(P.dataset),
             "--model", str(P.model),
