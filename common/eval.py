@@ -10,6 +10,10 @@ from datasets import mvtecad_dataset, get_dataset, get_superclass_list, get_subc
 
 P = parse_args()
 
+mvtech_label = None
+if P.mvtech_labels:
+    mvtech_label = [int(num) for num in P.mvtech_labels.split(',')]
+
 ### Set torch device ###
 
 P.n_gpus = torch.cuda.device_count()
@@ -32,7 +36,7 @@ else:
 if P.dataset=="MVTecAD":
     train_set, test_set, image_size, n_classes = mvtecad_dataset(P=P, category=P.one_class_idx, root = "./mvtec_anomaly_detection",  image_size=image_size_)
 else:
-    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size_)
+    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size_, labels=mvtech_label)
 
 P.image_size = image_size
 P.n_classes = n_classes

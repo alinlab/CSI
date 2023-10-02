@@ -213,6 +213,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         if sum(fcp) != cutpast_count:
             fcp[0] += abs(cutpast_count - sum(fcp))
         print("cutpast couns:", fcp)
+        train_ds_mvtech_fake = []
+        train_ds_mvtech_cutpasted = []
         for i in labels:
             train_ds_mvtech_fake.append(FakeMVTecDataset(root=fake_root, train=True, category=categories[i], transform=fake_transform, count=fc[i]))
             train_ds_mvtech_cutpasted.append(MVTecDataset_Cutpasted(root=root, train=True, category=categories[i], transform=train_transform_cutpasted, count=fcp[i]))

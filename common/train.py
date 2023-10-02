@@ -13,9 +13,11 @@ from utils.utils import load_checkpoint
 
 P = parse_args()
 
-### Set torch device ###
-mvtech_label = [4]
+mvtech_label = None
+if P.mvtech_labels:
+    mvtech_label = [int(num) for num in P.mvtech_labels.split(',')]
 
+### Set torch device ###
 if torch.cuda.is_available():
     torch.cuda.set_device(P.local_rank)
 device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")

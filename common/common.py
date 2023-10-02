@@ -9,6 +9,8 @@ def parse_args(default=False):
     parser.add_argument('--dataset', help='Dataset',
                         choices=['mvtec-high-var', 'breastmnist', 'head-ct', 'fashion-mnist', 'mnist', 'cifar10', 'cifar100', 'imagenet', 'svhn-10', 'MVTecAD'],
                         default="cifar10", type=str)
+    parser.add_argument('--mvtech_labels', help='mvtech_labels for high variation',
+                        default="0,1,2,3,4,5,6,7,8,9,10,11,12,13", type=str)
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
     parser.add_argument('--image_size', help='None: multi-class, Not None: one-class',
