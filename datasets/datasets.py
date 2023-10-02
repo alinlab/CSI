@@ -192,7 +192,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
 
         print("number of exposure:", len(exposureset))
-        train_loader = DataLoader(exposureset, batch_size = batch_size)
+        train_loader = DataLoader(exposureset, batch_size = batch_size, shuffle=True)
     elif P.dataset=="mvtec-high-var":
         fake_root = './fake_mvtecad'
         fake_transform = transforms.Compose([
@@ -206,18 +206,18 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             transforms.CenterCrop((image_size[0], image_size[1])),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
-        train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[4], transform=fake_transform, count=fake_count)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
+        train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[4], transform=fake_transform, count=fake_count)
         train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[4], transform=train_transform_cutpasted, count=cutpast_count)
 
-        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_cutpasted, train_ds_mvtech_fake, imagenet_exposure])
+        exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
         if len(train_ds_mvtech_fake) > 0:
             print("number of fake data:", len(train_ds_mvtech_fake), "shape:", train_ds_mvtech_fake[0][0].shape)
         if len(train_ds_mvtech_cutpasted) > 0:
             print("number of cutpast data:", len(train_ds_mvtech_cutpasted), 'shape:', train_ds_mvtech_cutpasted[0][0].shape)
         print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
         print("number of exposure:", len(exposureset))
-        train_loader = DataLoader(exposureset, batch_size = batch_size)
+        train_loader = DataLoader(exposureset, batch_size = batch_size, shuffle=True)
     else:
         if P.dataset=='head-ct' or P.dataset=='breastmnist' or P.dataset=='mnist' or P.dataset=='fashion-mnist':
             train_transform_cutpasted = transforms.Compose([
@@ -319,7 +319,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
         print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
         print("number of exposure:", len(exposureset))
-        train_loader = DataLoader(exposureset, batch_size = batch_size)
+        train_loader = DataLoader(exposureset, batch_size = batch_size, shuffle=True)
     return train_loader
 
 
