@@ -91,7 +91,7 @@ class MVTecDataset(Dataset):
                 self.image_files = self.image_files[:count]
             else:
                 t = len(self.image_files)
-                for i in range(count-len(self.image_files[:t])):
+                for i in range(count-t):
                     self.image_files.append(random.choice(self.image_files[:t]))
         self.image_files.sort(key=lambda y: y.lower())
         self.train = train
