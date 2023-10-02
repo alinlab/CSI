@@ -213,8 +213,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_cutpasted, train_ds_mvtech_fake, imagenet_exposure])
         if len(train_ds_mvtech_fake) > 0:
             print("number of fake data:", len(train_ds_mvtech_fake), "shape:", train_ds_mvtech_fake[0][0].shape)
-        if len(cutpast_train_set) > 0:
-            print("number of cutpast data:", len(cutpast_train_set), 'shape:', cutpast_train_set[0][0].shape)
+        if len(train_ds_mvtech_cutpasted) > 0:
+            print("number of cutpast data:", len(train_ds_mvtech_cutpasted), 'shape:', train_ds_mvtech_cutpasted[0][0].shape)
         print("number of tiny data:", len(imagenet_exposure), 'shape:', imagenet_exposure[0][0].shape)
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size)
