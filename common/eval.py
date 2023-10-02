@@ -13,7 +13,7 @@ P = parse_args()
 mvtech_label = None
 if P.mvtech_labels:
     mvtech_label = [int(num) for num in P.mvtech_labels.split(',')]
-
+    print("mvtech_label: ", mvtech_label)
 ### Set torch device ###
 
 P.n_gpus = torch.cuda.device_count()
