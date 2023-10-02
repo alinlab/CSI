@@ -78,6 +78,7 @@ class MVTecDataset(Dataset):
     def __init__(self, root, category, transform=None, train=True, count=-1):
         self.transform = transform
         self.image_files = []
+        print("category MVTecDataset:", category)
         if train:
             self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
         else:
@@ -114,6 +115,7 @@ class FakeMVTecDataset(Dataset):
     def __init__(self, root, category, transform=None, target_transform=None, train=True, count=-1):
         self.transform = transform
         self.image_files = []
+        print("category FakeMVTecDataset:", category)
         self.image_files = glob(os.path.join(root, category, "*.jpeg"))
         if count!=-1:
             if count<len(self.image_files):
@@ -138,6 +140,7 @@ class MVTecDataset_Cutpasted(Dataset):
     def __init__(self, root, category, transform=None, train=True, count=-1):
         self.transform = transform
         self.image_files = []
+        print("category MVTecDataset_Cutpasted:", category)
         if train:
             self.image_files = glob(os.path.join(root, category, "train", "good", "*.png"))
         else:
@@ -318,6 +321,7 @@ class MVTecDataset_High_VAR(Dataset):
         assert class_name in CLASS_NAMES, "class_name: {}, should be in {}".format(
             class_name, CLASS_NAMES
         )
+        print("class_name MVTecDataset_High_VAR:", class_name)
         self.dataset_path = dataset_path
         self.class_name = class_name
         self.is_train = is_train
