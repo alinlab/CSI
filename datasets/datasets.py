@@ -144,7 +144,7 @@ def mvtecad_dataset(P, category, root = "./mvtec_anomaly_detection", image_size=
     
 
 def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
-                            base_path = './tiny-imagenet-200', fake_root="./fake_mvtecad", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None):
+                            base_path = './tiny-imagenet-200', fake_root="./fake_mvtecad", root="./mvtec_anomaly_detection" ,count=-1, cls_list=None, labels=None):
     categories = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
     if P.dataset=='head-ct' or P.dataset=='breastmnist' or  P.dataset=='mnist' or P.dataset=='fashion-mnist':
         tiny_transform = transforms.Compose([
@@ -181,8 +181,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             transforms.CenterCrop((image_size[0], image_size[1])),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
-
-        
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[P.one_class_idx], transform=fake_transform, count=fake_count)
         train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[P.one_class_idx], transform=train_transform_cutpasted, count=cutpast_count)
@@ -207,8 +205,19 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
-        train_ds_mvtech_fake = FakeMVTecDataset(root=fake_root, train=True, category=categories[4], transform=fake_transform, count=fake_count)
-        train_ds_mvtech_cutpasted = MVTecDataset_Cutpasted(root=root, train=True, category=categories[4], transform=train_transform_cutpasted, count=cutpast_count)
+        fc = [int(fake_count / len(labels)) for i in range(len(labels))]
+        if sum(fc) != fake_count:
+            fc[0] += abs(fake_count - sum(fc))
+        print("fake couns:", fc)
+        fcp = [int(cutpast_count / len(labels)) for i in range(len(labels))]
+        if sum(fcp) != cutpast_count:
+            fcp[0] += abs(cutpast_count - sum(fcp))
+        print("cutpast couns:", fcp)
+        for i in labels:
+            train_ds_mvtech_fake.append(FakeMVTecDataset(root=fake_root, train=True, category=categories[i], transform=fake_transform, count=fc[i]))
+            train_ds_mvtech_cutpasted.append(MVTecDataset_Cutpasted(root=root, train=True, category=categories[i], transform=train_transform_cutpasted, count=fcp[i]))
+        train_ds_mvtech_cutpasted = ConcatDataset(train_ds_mvtech_cutpasted)
+        train_ds_mvtech_fake = ConcatDataset(train_ds_mvtech_fake)
 
         exposureset = torch.utils.data.ConcatDataset([train_ds_mvtech_fake, imagenet_exposure, train_ds_mvtech_cutpasted])
         if len(train_ds_mvtech_fake) > 0:
@@ -251,9 +260,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 cls_list = [P.one_class_idx]
         print("len(cutpast_train_set) after set_count: ", len(cutpast_train_set))
 
-        # if P.dataset!="mvtec-high-var":       
-        #    cutpast_train_set.transform = train_transform_cutpasted
-        # cutpast_train_set = DataOnlyDataset(cutpast_train_set)
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
             fake_transform = transforms.Compose([
@@ -380,7 +386,7 @@ def get_breastmnist_train(anomaly_class_indx, path, transform):
     return train_dataset
 
 
-def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False, train_transform_cutpasted=None):
+def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=False, eval=False, train_transform_cutpasted=None, labels=None):
     if dataset in ['imagenet', 'cub', 'stanford_dogs', 'flowers102',
                    'places365', 'food_101', 'caltech_256', 'dtd', 'pets']:
         if eval:
@@ -457,7 +463,6 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         n_classes = 2
         train_dataset = []
         test_dataset = []
-        labels = [4]
         root = "./mvtec_anomaly_detection"
         train_transform = transforms.Compose([
                 transforms.Resize((256, 256)),
