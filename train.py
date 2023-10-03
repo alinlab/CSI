@@ -65,7 +65,7 @@ for epoch in range(start_epoch, P.epochs + 1):
             "--resize_fix", 
             "--one_class_idx" , str(P.one_class_idx),
             "--load_path", str(P.load_path),
-            "--mvtech_labels", str(P.mvtech_labels)
+            "--normal_labels", str(P.normal_labels)
         ]
 
         result = subprocess.run(["python", "eval.py"] + arguments_to_pass, capture_output=True, text=True)

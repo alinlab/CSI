@@ -10,10 +10,14 @@ from datasets import mvtecad_dataset, get_dataset, get_superclass_list, get_subc
 
 P = parse_args()
 
-mvtech_label = None
-if P.mvtech_labels:
-    mvtech_label = [int(num) for num in P.mvtech_labels.split(',')]
-    print("mvtech_label: ", mvtech_label)
+normal_labels = None
+if P.normal_labels:
+    normal_labels = [int(num) for num in P.normal_labels.split(',')]
+    print("normal_labels: ", normal_labels)
+
+cls_list = get_superclass_list(P.dataset)
+anomaly_labels = [elem for elem in cls_list if elem not in normal_labels]
+
 ### Set torch device ###
 
 P.n_gpus = torch.cuda.device_count()
@@ -36,7 +40,7 @@ else:
 if P.dataset=="MVTecAD":
     train_set, test_set, image_size, n_classes = mvtecad_dataset(P=P, category=P.one_class_idx, root = "./mvtec_anomaly_detection",  image_size=image_size_)
 else:
-    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size_, labels=mvtech_label)
+    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size_, labels=normal_labels)
 
 P.image_size = image_size
 P.n_classes = n_classes
@@ -88,7 +92,7 @@ except:
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
         if P.high_var:
-            P.ood_dataset = [P.one_class_idx]
+            P.ood_dataset = anomaly_labels
         else:
             P.ood_dataset = list(range(P.n_superclasses))
             P.ood_dataset.pop(P.one_class_idx)
@@ -122,8 +126,6 @@ for ood in P.ood_dataset:
         print("Unique labels(ood_test_loader):", unique_labels)
     except:
         pass
-#_main_OOD_dataset_ = torch.utils.data.ConcatDataset(main_OOD_dataset)
-# ood_test_loader["One-Versus-All"] = DataLoader(_main_OOD_dataset_, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
 print("train loader batchs", len(train_loader))
 print("train_set:", len(train_set))

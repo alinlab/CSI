@@ -13,10 +13,13 @@ from utils.utils import load_checkpoint
 
 P = parse_args()
 
-mvtech_label = None
-if P.mvtech_labels:
-    mvtech_label = [int(num) for num in P.mvtech_labels.split(',')]
-    print("mvtech_label: ", mvtech_label)
+normal_labels = None
+if P.normal_labels:
+    normal_labels = [int(num) for num in P.normal_labels.split(',')]
+    print("normal_labels: ", normal_labels)
+
+cls_list = get_superclass_list(P.dataset)
+anomaly_labels = [elem for elem in cls_list if elem not in normal_labels]
 
 ### Set torch device ###
 if torch.cuda.is_available():
@@ -51,7 +54,7 @@ else:
 if P.dataset=="MVTecAD":
     train_set, test_set, image_size, n_classes = mvtecad_dataset(P=P, category=P.one_class_idx, root = "./mvtec_anomaly_detection",  image_size=image_size_)
 else:
-    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size_, labels=mvtech_label)
+    train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size_, labels=normal_labels)
 P.image_size = image_size
 P.n_classes = n_classes
 print("full test set:", len(test_set))
@@ -68,7 +71,7 @@ if P.one_class_idx is not None:
         if P.dataset=="MVTecAD" or P.dataset=='head-ct':
             print("erorr: These datasets are not proper for high_var settings!")
             raise Exception()
-        del cls_list[P.one_class_idx]
+        cls_list = normal_labels
         train_set = get_subclass_dataset(P, train_set, classes=cls_list, count=P.main_count)
         test_set = get_subclass_dataset(P, test_set, classes=cls_list)
     else:
@@ -105,7 +108,7 @@ except:
 if (P.ood_dataset is None) and (P.dataset!="MVTecAD"):
     if P.one_class_idx is not None:
         if P.high_var:
-            P.ood_dataset = [P.one_class_idx]
+            P.ood_dataset = anomaly_labels
         else:
             P.ood_dataset = list(range(P.n_superclasses))
             P.ood_dataset.pop(P.one_class_idx)
@@ -138,7 +141,7 @@ for ood in P.ood_dataset:
     except:
         pass
 
-train_exposure_loader = get_exposure_dataloader(P=P, batch_size=P.batch_size, count=len(train_set), image_size=image_size_, cls_list=cls_list, labels=mvtech_label)
+train_exposure_loader = get_exposure_dataloader(P=P, batch_size=P.batch_size, count=len(train_set), image_size=image_size_, cls_list=cls_list, labels=normal_labels)
 print("exposure loader batches, train loader batchs", len(train_exposure_loader), len(train_loader))
 print("train_set:", len(train_set))
 ### Initialize model ###
