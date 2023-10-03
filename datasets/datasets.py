@@ -712,12 +712,22 @@ def set_dataset_count(dataset, count=-1):
     if count==-1:
         pass
     elif len(dataset)>count:
-        dataset = Subset(dataset, [i for i in range(count)])
+        unique_numbers = []
+        while len(unique_numbers) < count:
+            number = random.randint(0, len(dataset)-1)
+            if number not in unique_numbers:
+                unique_numbers.append(number)
+        dataset = Subset(dataset, unique_numbers)
     else:
         num = int(count / len(dataset))
         remainding = (count - num*len(dataset))
         trnsets = [dataset for i in range(num)]
-        dataset = Subset(dataset, [i for i in range(remainding)])
+        unique_numbers = []
+        while len(unique_numbers) < remainding:
+            number = random.randint(0, len(dataset)-1)
+            if number not in unique_numbers:
+                unique_numbers.append(number)
+        dataset = Subset(dataset, unique_numbers)
         trnsets = trnsets + [dataset]
         dataset = torch.utils.data.ConcatDataset(trnsets)
 
