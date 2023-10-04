@@ -251,10 +251,18 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
 
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
-            tiny1_cnt=int(tiny_count/2) 
-            tiny2_cnt = tiny_count - tiny1_cnt
+            tiny_transform = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.AutoAugment(),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            # tiny1_cnt=int(tiny_count/2) 
+            # tiny2_cnt = tiny_count - tiny1_cnt
+            tiny1_cnt = 100000
             imagenet_exposure1 = ImageNetExposure(root=base_path, count=tiny1_cnt, transform=tiny_transform)
             imagenet_exposure2 = datasets.ImageFolder(train_dir, transform=tiny_transform)
+            tiny2_cnt = 50000 
             unique_numbers = []
             while len(unique_numbers) < tiny2_cnt:
                 number = random.randint(0, len(imagenet_exposure2)-1)
