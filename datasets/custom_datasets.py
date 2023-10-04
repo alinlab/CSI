@@ -401,3 +401,27 @@ class MVTecDataset_High_VAR(Dataset):
 
         assert len(x) == len(y), "number of x and y should be same"
         return list(x), list(y), list(mask)
+
+
+class FakeCIFAR100(Dataset):
+    def __init__(self, root, category, transform=None, target_transform=None, train=True, count=2500):
+        self.transform = transform
+        self.image_files = []
+        for i in range(len(category)):
+            img_files = list(np.load("./cifar100_training_gen_data.npy")[2500*i:2500*(i+1)])
+            if count[i]<len(img_files):
+                img_files = img_files[:count[i]]
+            else:
+                t = len(img_files)
+                for i in range(count[i]-t):
+                    img_files.append(random.choice(img_files[:t]))            
+            self.image_files += img_files
+        # self.image_files.sort(key=lambda y: y.lower())
+
+    def __getitem__(self, index):
+        image = Image.fromarray(self.image_files[index])
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, -1
+    def __len__(self):
+        return len(self.image_files)
