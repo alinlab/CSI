@@ -35,28 +35,20 @@ MVTecAD_SUPERCLASS = list(range(2))
 HEAD_CT_SUPERCLASS = list(range(2))
 MVTEC_HV_SUPERCLASS = list(range(2))
 breastmnist_SUPERCLASS = list(range(2))
-CIFAR100_SUPERCLASS = [
-    [4, 31, 55, 72, 95],
-    [1, 33, 67, 73, 91],
-    [54, 62, 70, 82, 92],
-    [9, 10, 16, 29, 61],
-    [0, 51, 53, 57, 83],
-    [22, 25, 40, 86, 87],
-    [5, 20, 26, 84, 94],
-    [6, 7, 14, 18, 24],
-    [3, 42, 43, 88, 97],
-    [12, 17, 38, 68, 76],
-    [23, 34, 49, 60, 71],
-    [15, 19, 21, 32, 39],
-    [35, 63, 64, 66, 75],
-    [27, 45, 77, 79, 99],
-    [2, 11, 36, 46, 98],
-    [28, 30, 44, 78, 93],
-    [37, 50, 65, 74, 80],
-    [47, 52, 56, 59, 96],
-    [8, 13, 48, 58, 90],
-    [41, 69, 81, 85, 89],
-]
+CIFAR100_SUPERCLASS = list(range(20))
+
+def sparse2coarse(targets):
+    coarse_labels = np.array(
+        [4,1,14, 8, 0, 6, 7, 7, 18, 3, 3,
+         14, 9, 18, 7, 11, 3, 9, 7, 11, 6, 11, 5,
+         10, 7, 6, 13, 15, 3, 15, 0, 11, 1, 10,
+         12, 14, 16, 9, 11, 5, 5, 19, 8, 8, 15,
+         13, 14, 17, 18, 10, 16, 4, 17, 4, 2, 0,
+         17, 4, 18, 17, 10, 3, 2, 12, 12, 16, 12,
+         1, 9, 19, 2, 10, 0, 1, 16, 12, 9, 13,
+         15, 13, 16, 19, 2, 4, 6, 19, 5, 5, 8,
+         19, 18, 1, 2, 15, 6, 0, 17, 8, 14, 13,])
+    return coarse_labels[targets]
 
 CLASS_NAMES = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
 
@@ -528,6 +520,9 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         else:
             train_set = datasets.CIFAR100(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR100(DATA_PATH, train=False, download=download, transform=test_transform)
+        test_set.targets = sparse2coarse(test_set.targets)
+        train_set.targets = sparse2coarse(train_set.targets)
+
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'mnist':
