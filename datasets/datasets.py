@@ -254,7 +254,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             tiny1_cnt=int(tiny_count/2) 
             tiny2_cnt = tiny_count - tiny1_cnt
             imagenet_exposure1 = ImageNetExposure(root=base_path, count=tiny1_cnt, transform=tiny_transform)
-            imagenet_exposure2 = datasets.ImageFolder(train_dir, transform=train_transform)
+            imagenet_exposure2 = datasets.ImageFolder(train_dir, transform=tiny_transform)
             unique_numbers = []
             while len(unique_numbers) < tiny2_cnt:
                 number = random.randint(0, len(imagenet_exposure2)-1)
