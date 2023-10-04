@@ -202,4 +202,15 @@ def make_model_diagrams(probs, labels, n_bins=10):
     f.tight_layout()
     return f
 
+def get_loader_unique_label(loader):
+    try:
+        unique_labels = set()
+        for _, labels in loader:
+            unique_labels.update(labels.tolist())
+        unique_labels = sorted(list(unique_labels))
+    except:
+        print("can not compute unique loader!")
+        unique_labels = []
+    return unique_labels
+
 

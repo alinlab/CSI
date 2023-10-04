@@ -197,18 +197,17 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
         ])
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
-        fc = [int(fake_count / len(labels)) for i in range(len(labels))]
+        fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
         if sum(fc) != fake_count:
             fc[0] += abs(fake_count - sum(fc))
         print("fake couns:", fc)
-        fcp = [int(cutpast_count / len(labels)) for i in range(len(labels))]
+        fcp = [int(cutpast_count / len(cls_list)) for i in range(len(cls_list))]
         if sum(fcp) != cutpast_count:
             fcp[0] += abs(cutpast_count - sum(fcp))
         print("cutpast couns:", fcp)
         train_ds_mvtech_fake = []
         train_ds_mvtech_cutpasted = []
-        for idx, i in enumerate(labels):
-            print
+        for idx, i in enumerate(cls_list):
             train_ds_mvtech_fake.append(FakeMVTecDataset(root=fake_root, train=True, category=categories[i], transform=fake_transform, count=fc[idx]))
             train_ds_mvtech_cutpasted.append(MVTecDataset_Cutpasted(root=root, train=True, category=categories[i], transform=train_transform_cutpasted, count=fcp[idx]))
         train_ds_mvtech_cutpasted = ConcatDataset(train_ds_mvtech_cutpasted)
@@ -241,12 +240,8 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         if P.dataset=='head-ct' or P.dataset=='mvtec-high-var':
             cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
         else:
-            if P.high_var:
-                print("cls_list", cls_list)
-                cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list, count=cutpast_count)
-            else:
-                cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list[P.one_class_idx], count=cutpast_count)
-                cls_list = [P.one_class_idx]
+            print("cls_list(normal class)", cls_list)
+            cutpast_train_set = get_subclass_dataset(P, cutpast_train_set, classes=cls_list, count=cutpast_count)
         print("len(cutpast_train_set) after set_count: ", len(cutpast_train_set))
 
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
@@ -448,7 +443,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.ToTensor(),
         ])
         labels_df = pd.read_csv('./head-ct/labels.csv')
-        labels = np.array(labels_df[' hemorrhage'].tolist())
+        labels_ = np.array(labels_df[' hemorrhage'].tolist())
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
         np.random.seed  (1225)
         indicies = np.random.permutation(100)
@@ -456,8 +451,8 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         train_false_idx, test_false_idx = indicies[:75] + 100, indicies[75:] + 100
         train_idx, test_idx = train_true_idx, np.concatenate((test_true_idx, test_false_idx, train_false_idx))
 
-        train_image, train_label = images[train_idx], labels[train_idx]
-        test_image, test_label = images[test_idx], labels[test_idx]
+        train_image, train_label = images[train_idx], labels_[train_idx]
+        test_image, test_label = images[test_idx], labels_[test_idx]
 
         print("train_image.shape, test_image.shape: ", train_image.shape, test_image.shape)
         print("train_label.shape, test_label.shape: ", train_label.shape, test_label.shape)
@@ -518,6 +513,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         train_transform = transforms.Compose([
             transforms.Resize((image_size[0], image_size[1])),
             transforms.Grayscale(num_output_channels=3),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
         ])
         test_transform = transforms.Compose([
@@ -568,11 +564,15 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
     elif dataset == 'svhn-10':
         # image_size = (32, 32, 3)
         n_classes = 10
+        transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
         if train_transform_cutpasted:
             train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=train_transform_cutpasted)
         else:
-            train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=test_transform)
-        test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=test_transform)
+            train_set = datasets.SVHN(DATA_PATH, split='train', download=download, transform=transform)
+        test_set = datasets.SVHN(DATA_PATH, split='test', download=download, transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'svhn':
