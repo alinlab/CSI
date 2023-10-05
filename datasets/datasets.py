@@ -257,7 +257,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             ])
             # tiny1_cnt=int(tiny_count/2) 
             # tiny2_cnt = tiny_count - tiny1_cnt
-            tiny1_cnt = 100000
+            tiny1_cnt = 97500
             imagenet_exposure1 = ImageNetExposure(root=base_path, count=tiny1_cnt, transform=tiny_transform)
             imagenet_exposure2 = datasets.ImageFolder('./one_class_train', transform=tiny_transform)
             tiny2_cnt = 39000 
