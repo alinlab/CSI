@@ -36,7 +36,7 @@ HEAD_CT_SUPERCLASS = list(range(2))
 MVTEC_HV_SUPERCLASS = list(range(2))
 breastmnist_SUPERCLASS = list(range(2))
 CIFAR100_SUPERCLASS = list(range(20))
-
+UCSD_SUPERCLASS = list(range(2))
 def sparse2coarse(targets):
     coarse_labels = np.array(
         [4,1,14, 8, 0, 6, 7, 7, 18, 3, 3,
@@ -237,7 +237,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             ])
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size, train_transform_cutpasted=train_transform_cutpasted)
         print("len(cutpast_train_set) before set_count: ", len(cutpast_train_set))
-        if P.dataset=='head-ct' or P.dataset=='mvtec-high-var':
+        if P.dataset=='head-ct' or P.dataset=='mvtec-high-var' or P.dataset=='ucsd':
             cutpast_train_set = set_dataset_count(cutpast_train_set, count=cutpast_count)
         else:
             print("cls_list(normal class)", cls_list)
@@ -401,6 +401,19 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         else:
             train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+    elif dataset == 'ucsd':
+        n_classes = 2
+        transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+        if train_transform_cutpasted:
+            train_set = UCSDDataset(root="./", is_normal=True, transform=train_transform_cutpasted)
+        else:
+            train_set = UCSDDataset(root="./", is_normal=True, transform=transform)
+        test_set = UCSDDataset(root="./", is_normal=False, transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'head-ct':
@@ -662,6 +675,8 @@ def get_superclass_list(dataset):
         return MNIST_SUPERCLASS
     elif dataset == 'cifar100':
         return CIFAR100_SUPERCLASS
+    elif dataset == 'ucsd':
+        return UCSD_SUPERCLASS
     elif dataset == 'imagenet':
         return IMAGENET_SUPERCLASS
     else:
