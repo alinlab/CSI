@@ -246,6 +246,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
 
         imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
         if P.dataset=="cifar10":
+            """
             tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.RandomChoice(
@@ -255,6 +256,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
             ])
+            
             # tiny1_cnt=int(tiny_count/2) 
             # tiny2_cnt = tiny_count - tiny1_cnt
             tiny1_cnt = 97500
@@ -270,7 +272,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             imagenet_exposure2 = Subset(imagenet_exposure2, unique_numbers)
             '''
             imagenet_exposure = torch.utils.data.ConcatDataset([imagenet_exposure1, imagenet_exposure2])
-
+            """
             fake_transform = transforms.Compose([
                 transforms.Resize((image_size[0],image_size[1])),
                 transforms.RandomHorizontalFlip(),
