@@ -11,6 +11,8 @@ from datasets.cutpast_transformation import *
 from PIL import Image
 from glob import glob
 import random
+import rasterio
+import re
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -425,3 +427,95 @@ class FakeCIFAR100(Dataset):
         return image, -1
     def __len__(self):
         return len(self.image_files)
+
+
+
+class UCSDDataset(Dataset):
+    def __init__(self, root, dataset='ped1', is_normal=True, transform=None, target_transform=None, download=False):
+        self.root = os.path.join(root, 'UCSD_Anomaly_Dataset.v1p2')
+        self.is_normal = is_normal
+        self.transform = transform
+        self.target_transform = target_transform
+        self.dataset = dataset
+        # download not supported
+
+        if self.dataset == 'ped1':
+            base_dir = 'UCSDped1'
+        if self.dataset == 'ped2':
+            base_dir = 'UCSDped2'
+
+        if not self.is_normal:
+            sub_dir = 'Test'
+        else:
+            sub_dir = 'Train'
+
+        video_dir = glob(os.path.join(self.root, base_dir, sub_dir, sub_dir+'*'))
+        self.video_dir = sorted([x for x in video_dir if re.fullmatch('.*\d\d\d', x)])
+        self.videos_len = []
+        self.images_dir = []
+        for video in self.video_dir:
+            images = list(sorted(glob(os.path.join(video, "*.tif"))))
+            self.images_dir += images
+            self.videos_len.append(len(images))
+        self.num_samples = len(self.images_dir)
+        self.labels = self._gather_labels()
+
+
+
+    def __getitem__(self, index):
+        with rasterio.open(self.images_dir[index]) as image:
+            image_array = image.read()
+            # torch.Size([238, 1, 158])
+            image = transforms.ToPILImage(mode='RGB')(
+                transforms.ToTensor()(image_array).permute(1, 2, 0).repeat(3, 1, 1)
+            )
+        if self.transform:
+            image = self.transform(image)
+        label = self.get_label(index)
+        if self.target_transform:
+            label = self.target_transform(label)
+        return image, label
+
+    def _gather_labels(self):
+        if self.is_normal:
+            return None
+        if self.dataset == 'ped1':
+            base_dir = 'UCSDped1'
+        if self.dataset == 'ped2':
+            base_dir = 'UCSDped2'
+        
+        with open(os.path.join(self.root, base_dir, 'Test', f'{base_dir}.m'), 'r') as file:
+            lines = file.readlines()
+
+        annotations = []
+
+
+        video_index = 0
+        # Iterate over the lines
+        for line in lines:
+            # Use regular expressions to extract the frame ranges
+            matches = re.findall(r'(\d+:\d+)', line)
+            if len(matches) == 0:
+                continue
+
+            frame_mask = np.zeros(self.videos_len[video_index], dtype=bool)
+            for match in matches:
+                start, end = map(int, match.split(':'))
+                frame_mask[start-1:end] = True
+
+            annotations.append(frame_mask)
+            video_index += 1
+        annotations = np.concatenate(annotations)
+        return annotations
+
+    def get_label(self, index):
+        if self.is_normal:
+            label = 0
+        else:
+            label = 1 if self.labels[index] else 0
+            
+
+        return label
+
+    def __len__(self):
+        return len(self.images_dir)
