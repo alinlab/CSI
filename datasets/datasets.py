@@ -285,17 +285,6 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
         elif P.dataset=="cifar100":
-            tiny_transform = transforms.Compose([
-                transforms.Resize((image_size[0], image_size[1])),
-                transforms.RandomChoice(
-                    [transforms.RandomApply([transforms.RandomAffine(90, translate=(0.15, 0.15), scale=(0.85, 1), shear=None)], p=0.6),
-                    transforms.RandomApply([transforms.RandomAffine(0, translate=None, scale=(0.5, 0.75), shear=30)], p=0.6),]),
-                transforms.AutoAugment(),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor()
-            ])
-            imagenet_exposure = ImageNetExposure(root=base_path, count=tiny_count, transform=tiny_transform)
-
             fake_transform = transforms.Compose([
                 transforms.Resize((image_size[0],image_size[1])),
                 transforms.RandomHorizontalFlip(),
