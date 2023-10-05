@@ -140,12 +140,12 @@ if P.resume_path is not None:
     model.load_state_dict(model_state, strict=not P.no_strict)
     optimizer.load_state_dict(optim_state)
     start_epoch = config['epoch']
-    best = config['best']
+    # best = config['best']
     error = 100.0
 else:
     resume = False
     start_epoch = 1
-    best = 100.0
+    # best = 100.0
     error = 100.0
 
 if P.mode == 'sup_linear' or P.mode == 'sup_CSI_linear':
