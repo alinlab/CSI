@@ -19,10 +19,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import cv2
 
-
 import subprocess
 from tqdm import tqdm
 import requests
+
+import shutil
+import random
+import zipfile
+import time
 
 CLASS_NAMES = ['toothbrush', 'zipper', 'transistor', 'tile', 'grid', 'wood', 'pill', 'bottle', 'capsule', 'metal_nut', 'hazelnut', 'screw', 'carpet', 'leather', 'cable']
 DATA_PATH = './data/'
@@ -519,3 +523,131 @@ class UCSDDataset(Dataset):
 
     def __len__(self):
         return len(self.images_dir)
+
+
+
+
+class TumorDetection(torch.utils.data.Dataset):
+    def __init__(self, transform=None, train=True, count=None):
+        self._download_and_extract()
+        self.transform = transform
+        if train:
+            self.image_files = glob(
+                os.path.join( './MRI', "Training", "notumor", "*.jpg")
+            )
+        else:
+          image_files = glob(os.path.join( './MRI', "Testing", "*", "*.jpg"))
+          normal_image_files = glob(os.path.join( './MRI', "./Testing", "notumor", "*.jpg"))
+          anomaly_image_files = list(set(image_files) - set(normal_image_files))
+          self.image_files = image_files
+
+        if count is not None:
+            if count > len(self.image_files):
+                self.image_files = self._oversample(count)
+            else:
+                self.image_files  = self._undersample(count)
+
+        self.image_files.sort(key=lambda y: y.lower())
+        self.train = train
+    
+    def _download_and_extract(self):
+        google_id = '1AOPOfQ05aSrr2RkILipGmEkgLDrZCKz_'
+        file_path = os.path.join('./MRI', 'Training')
+
+        if os.path.exists(file_path):
+            return
+
+        if not os.path.exists('./MRI'):
+            os.makedirs('./MRI')
+
+        if not os.path.exists(file_path):
+            subprocess.run(['gdown', google_id, '-O', './MRI/archive(3).zip'])
+        
+        with zipfile.ZipFile("./MRI/archive(3).zip", 'r') as zip_ref:
+            zip_ref.extractall("./MRI/")
+
+        os.rename(  "./MRI/Training/glioma", "./MRI/Training/glioma_tr")
+        os.rename(  "./MRI/Training/meningioma", "./MRI/Training/meningioma_tr")
+        os.rename(  "./MRI/Training/pituitary", "./MRI/Training/pituitary_tr")
+        
+        shutil.move("./MRI/Training/glioma_tr","./MRI/Testing")
+        shutil.move("./MRI/Training/meningioma_tr","./MRI/Testing")
+        shutil.move("./MRI/Training/pituitary_tr","./MRI/Testing")
+
+
+    def __getitem__(self, index):
+        image_file = self.image_files[index]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        image = image.resize((256, 256))
+        
+        if self.transform:
+            if isinstance(self.transform, A.core.composition.Compose):
+                image = self.transform(image=np.array(image))['image']/255
+            else:
+                image = self.transform(image)
+        
+        if "notumor" in os.path.dirname(image_file):
+            target = 0
+        else:
+            target = 1
+
+        return image, target
+
+    def __len__(self):
+        return len(self.image_files)
+
+
+    def _oversample(self, count):
+        num_extra_samples = count - len(self.image_files)
+        extra_image_files = [random.choice(self.image_files) for _ in range(num_extra_samples)]
+
+        return self.image_files + extra_image_files
+
+    def _undersample(self, count):
+        indices = random.sample(range(len(self.image_files)), count)
+        new_image_files = [self.image_files[idx] for idx in indices]
+
+        return new_image_files
+
+
+class AdaptiveExposure(Dataset):
+    def __init__(self, root, transform, count=None):
+        super(AdaptiveExposure, self).__init__()
+        self.root = root
+        self.image_files = glob(os.path.join(root, '**', "*.png"), recursive=True)
+        self.transform = transform
+        if count is not None:
+            if count > len(self.image_files):
+                self.image_files = self._oversample(count)
+            else:
+                self.image_files = self._undersample(count)
+
+    def __len__(self):
+        return len(self.image_files)
+
+    def __getitem__(self, idx):
+        image_file = self.image_files[idx]
+        image = Image.open(image_file)
+        image = image.convert('RGB')
+        image = image.resize((256, 256))
+        
+        if self.transform:
+            if isinstance(self.transform, A.core.composition.Compose):
+                image = self.transform(image=np.array(image))['image']/255
+            else:
+                image = self.transform(image)
+        
+        return image, 1
+
+    def _oversample(self, count):
+        num_extra_samples = count - len(self.image_files)
+        extra_image_files = [random.choice(self.image_files) for _ in range(num_extra_samples)]
+
+        return self.image_files + extra_image_files
+
+    def _undersample(self, count):
+        indices = random.sample(range(len(self.image_files)), count)
+        new_image_files = [self.image_files[idx] for idx in indices]
+
+        return new_image_files

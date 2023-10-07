@@ -418,6 +418,19 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         test_set = UCSDDataset(root="./", is_normal=False, transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
+    elif dataset == 'Tomor_Detection':
+        transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+        if train_transform_cutpasted:
+            train_dataset_normal = TumorDetection(transform=train_transform_cutpasted, train=True)
+        else:
+            train_dataset_normal = TumorDetection(transform=transform, train=True)
+        train_dataset_normal = TumorDetection(transform=transform, train=False)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+
     elif dataset == 'head-ct':
         n_classes = 2
         train_transform = transforms.Compose([
