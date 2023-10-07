@@ -677,7 +677,7 @@ def get_superclass_list(dataset):
         return SVHN_SUPERCLASS
     elif dataset == 'breastmnist':
         return breastmnist_SUPERCLASS
-    elif dataset == 'ucsd':
+    elif dataset == 'Tomor_Detection':
         return TUMOR_BRAIN_SUPERCLASS
     elif dataset == 'MVTecAD':
         return MVTecAD_SUPERCLASS
