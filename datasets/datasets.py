@@ -345,6 +345,19 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_fmnist_fake) > 0:
                 print("number of fake data:", len(train_ds_fmnist_fake), "shape:", train_ds_fmnist_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_fmnist_fake, imagenet_exposure])
+        elif P.dataset=="Tomor_Detection":
+            fake_transform = transforms.Compose([
+                transforms.Resize((image_size[0],image_size[1])),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.Grayscale(num_output_channels=3),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])            
+            train_ds_tumor_detection_fake = AdaptiveExposure(root='./AdaptiveExposure/', transform=fake_transform)
+            if len(train_ds_tumor_detection_fake) > 0:
+                print("number of fake data:", len(train_ds_tumor_detection_fake), "shape:", train_ds_tumor_detection_fake[0][0].shape)
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_tumor_detection_fake, imagenet_exposure])
+
         else:
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, imagenet_exposure])
         

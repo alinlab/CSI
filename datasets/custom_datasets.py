@@ -630,10 +630,7 @@ class AdaptiveExposure(Dataset):
         image = image.resize((256, 256))
         
         if self.transform:
-            if isinstance(self.transform, A.core.composition.Compose):
-                image = self.transform(image=np.array(image))['image']/255
-            else:
-                image = self.transform(image)
+            image = self.transform(image)
         
         return image, 1
 
