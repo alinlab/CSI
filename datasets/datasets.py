@@ -28,6 +28,7 @@ IMAGENET_PATH = './data/ImageNet'
 
 CIFAR10_SUPERCLASS = list(range(10))  # one class
 IMAGENET_SUPERCLASS = list(range(30))  # one class
+TUMOR_BRAIN_SUPERCLASS = list(range(2))
 MNIST_SUPERCLASS = list(range(10))
 SVHN_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))
@@ -676,6 +677,8 @@ def get_superclass_list(dataset):
         return SVHN_SUPERCLASS
     elif dataset == 'breastmnist':
         return breastmnist_SUPERCLASS
+    elif dataset == 'ucsd':
+        return TUMOR_BRAIN_SUPERCLASS
     elif dataset == 'MVTecAD':
         return MVTecAD_SUPERCLASS
     elif dataset == 'head-ct':
