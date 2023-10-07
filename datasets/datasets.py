@@ -425,10 +425,10 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.ToTensor(),
         ])
         if train_transform_cutpasted:
-            train_dataset_normal = TumorDetection(transform=train_transform_cutpasted, train=True)
+            train_set = TumorDetection(transform=train_transform_cutpasted, train=True)
         else:
-            train_dataset_normal = TumorDetection(transform=transform, train=True)
-        train_dataset_normal = TumorDetection(transform=transform, train=False)
+            train_set = TumorDetection(transform=transform, train=True)
+        test_set = TumorDetection(transform=transform, train=False)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
 
