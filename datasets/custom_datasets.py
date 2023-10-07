@@ -582,10 +582,7 @@ class TumorDetection(torch.utils.data.Dataset):
         image = image.resize((256, 256))
         
         if self.transform:
-            if isinstance(self.transform, A.core.composition.Compose):
-                image = self.transform(image=np.array(image))['image']/255
-            else:
-                image = self.transform(image)
+            image = self.transform(image)
         
         if "notumor" in os.path.dirname(image_file):
             target = 0
