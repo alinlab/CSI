@@ -223,13 +223,21 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
         print("number of exposure:", len(exposureset))
         train_loader = DataLoader(exposureset, batch_size = batch_size, shuffle=True)
     else:
-        if P.dataset=='head-ct' or P.dataset=='breastmnist' or P.dataset=='mnist' or P.dataset=='fashion-mnist' or P.dataset=='Tomor_Detection':
+        if P.dataset=='head-ct' or P.dataset=='breastmnist' or P.dataset=='mnist' or P.dataset=='fashion-mnist':
             train_transform_cutpasted = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.Grayscale(num_output_channels=1),
                 transforms.Grayscale(num_output_channels=3),
                 transforms.RandomRotation((90, 270)),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
+            ])
+        elif P.dataset=='Tomor_Detection':
+            train_transform_cutpasted = transforms.Compose([
+                transforms.Resize((image_size[0], image_size[1])),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.Grayscale(num_output_channels=3),
+                transforms.RandomRotation((90, 270)),
+                CutPasteNormal(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
         else:
             train_transform_cutpasted = transforms.Compose([
