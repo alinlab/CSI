@@ -156,8 +156,8 @@ class High_CutPasteUnion(object):
         "aspect_ratio":0.4, 
         "transform": transforms.Compose([transforms.ToTensor(),])  
       }
-      self.scar = CutPasteScar(kwags1)
-      self.normal = CutPasteNormal(kwags2)
+      self.scar = CutPasteScar(**kwags1)
+      self.normal = CutPasteNormal(**kwags2)
     
     def __call__(self, img):
         r = random.uniform(0, 1)
