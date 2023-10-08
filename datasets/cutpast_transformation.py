@@ -161,6 +161,8 @@ class High_CutPasteUnion(object):
     
     def __call__(self, img):
         r = random.uniform(0, 1)
+        return self.normal(img)
+
         if r < 0.5:
             return self.normal(img)
         else:
