@@ -205,7 +205,7 @@ class HEAD_CT_DATASET(Dataset):
         image = image.convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
-        return image, 1-self.labels[index]
+        return image, self.labels[index]
     
     def __len__(self):
         return len(self.image_files)

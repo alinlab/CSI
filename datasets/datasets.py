@@ -475,8 +475,8 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         images = np.array(sorted(glob('./head-ct/head_ct/head_ct/*.png')))
         np.random.seed  (1225)
         indicies = np.random.permutation(100)
-        train_true_idx, test_true_idx = indicies[:75], indicies[75:]
-        train_false_idx, test_false_idx = indicies[:75] + 100, indicies[75:] + 100
+        train_true_idx, test_true_idx = indicies[:75]+ 100, indicies[75:]+ 100
+        train_false_idx, test_false_idx = indicies[:75], indicies[75:]
         train_idx, test_idx = train_true_idx, np.concatenate((test_true_idx, test_false_idx, train_false_idx))
 
         train_image, train_label = images[train_idx], labels_[train_idx]
