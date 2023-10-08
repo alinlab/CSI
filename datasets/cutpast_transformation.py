@@ -147,8 +147,8 @@ class CutPaste3Way(object):
 class High_CutPasteUnion(object):
     def __init__(self, **kwags):
       kwags1={
-        "width":[10,15],
-        "height":[15,25],
+        "width":[20,30],
+        "height":[20,35],
         "transform": transforms.Compose([transforms.ToTensor(),])  
       }
       kwags2={
@@ -161,8 +161,6 @@ class High_CutPasteUnion(object):
     
     def __call__(self, img):
         r = random.uniform(0, 1)
-        return self.normal(img)
-
         if r < 0.5:
             return self.normal(img)
         else:
