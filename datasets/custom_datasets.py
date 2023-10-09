@@ -666,3 +666,44 @@ class HEAD_CT_FAKE(Dataset):
         return image, target
     def __len__(self):
         return len(self.image_files)
+
+
+
+import torch
+from torchvision import transforms
+from torch.utils.data import Dataset, DataLoader
+import numpy as np
+from PIL import Image
+
+class CIFAR_CORRUCPION(Dataset):
+    def __init__(self, transform=None, normal_idx = [0]):
+        cifar_corruption_data = './CIFAR-10-C/defocus_blur.npy'
+        cifar_corruption_label = 'CIFAR-10-C/labels.npy'
+        self.labels_10 = np.load(cifar_corruption_label)
+        self.labels_10 = self.labels_10[40000:]
+        self.data = np.load(cifar_corruption_data)
+        self.data = self.data[40000:]
+        self.transform = transform
+        '''
+        def indice_by_label(data_labels, normal_labels):
+            items_index = []
+            for label in normal_labels:
+                items_index = items_index + list(np.where(self.labels_10 == 1)[0])
+            return items_index
+        
+        normal_indice = indice_by_label(data_labels=self.labels_10, normal_labels=normal_idx)
+        anomaly_indice = list(set(list(range(len(self.labels_10)))) - set(normal_indice))
+
+        self.labels_10[normal_indice] = 0
+        self.labels_10[anomaly_indice] = 1
+        '''
+    def __getitem__(self, index):
+        x = self.data[index]
+        y = self.labels_10[index]
+        if self.transform:
+            x = Image.fromarray((x * 255).astype(np.uint8))
+            x = self.transform(x)    
+        return x, y
+    
+    def __len__(self):
+        return len(self.data)
