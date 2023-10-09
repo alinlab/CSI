@@ -38,6 +38,8 @@ MVTEC_HV_SUPERCLASS = list(range(2))
 breastmnist_SUPERCLASS = list(range(2))
 CIFAR100_SUPERCLASS = list(range(20))
 UCSD_SUPERCLASS = list(range(2))
+CIFAR10_CORRUPTION_SUPERCLASS = list(range(10))
+
 def sparse2coarse(targets):
     coarse_labels = np.array(
         [4,1,14, 8, 0, 6, 7, 7, 18, 3, 3,
@@ -728,6 +730,8 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
 def get_superclass_list(dataset):
     if dataset == 'svhn-10':
         return SVHN_SUPERCLASS
+    elif dataset == 'cifar10-corruption':
+        return CIFAR10_CORRUPTION_SUPERCLASS
     elif dataset == 'breastmnist':
         return breastmnist_SUPERCLASS
     elif dataset == 'Tomor_Detection':
