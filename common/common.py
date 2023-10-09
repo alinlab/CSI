@@ -11,6 +11,8 @@ def parse_args(default=False):
                         default="cifar10", type=str)
     parser.add_argument('--normal_labels', help='normal_labels for high variation',
                         default="0,1,2,3,4,5,6,7,8,9,10,11,12,13", type=str)
+    parser.add_argument('--cifar_corruption_data', help='',
+                        default="./CIFAR-10-C/defocus_blur.npy", type=str)                    
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
     parser.add_argument('--image_size', help='None: multi-class, Not None: one-class',

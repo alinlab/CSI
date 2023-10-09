@@ -676,9 +676,7 @@ import numpy as np
 from PIL import Image
 
 class CIFAR_CORRUCPION(Dataset):
-    def __init__(self, transform=None, normal_idx = [0]):
-        cifar_corruption_data = './CIFAR-10-C/defocus_blur.npy'
-        cifar_corruption_label = 'CIFAR-10-C/labels.npy'
+    def __init__(self, transform=None, normal_idx = [0], cifar_corruption_label = 'CIFAR-10-C/labels.npy', cifar_corruption_data = './CIFAR-10-C/defocus_blur.npy'):
         self.labels_10 = np.load(cifar_corruption_label)
         self.labels_10 = self.labels_10[40000:]
         self.data = np.load(cifar_corruption_data)
