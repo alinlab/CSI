@@ -28,11 +28,11 @@ class Pretrain_VIT(BaseModel):
         self.in_planes = 64
         self.last_dim = 768
 
-        mu = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1).cuda()
-        std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1).cuda()
+        mu = torch.tensor([0.5, 0.5, 0.5]).view(3, 1, 1).cuda()
+        std = torch.tensor([0.5, 0.5, 0.5]).view(3, 1, 1).cuda()
         self.norm = lambda x: ( x - mu ) / std
         self.backbone = timm.create_model("vit_base_patch16_224", pretrained=True)
-        self.backbone.head= torch.nn.Identity()
+        self.backbone.head = torch.nn.Identity()
         i = 0
         num = 76
         for param in self.backbone.parameters():
