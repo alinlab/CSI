@@ -15,7 +15,7 @@ def parse_args(default=False):
                         default="./CIFAR-10-C/defocus_blur.npy", type=str)                    
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
-      parser.add_argument('--unfreeze_pretrain_model_epoch', help='unfreeze_pretrain_model',
+    parser.add_argument('--unfreeze_pretrain_model_epoch', help='unfreeze_pretrain_model',
                         default=50, type=int)
     parser.add_argument('--image_size', help='None: multi-class, Not None: one-class',
                         default=32, type=int)
