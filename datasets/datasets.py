@@ -587,8 +587,8 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         ])
         test_dataset = MyDataset_Binary(test_set__t, test_label, orig_transform_224)
         train_dataset = MyDataset_Binary(Normal_data, Normal_label, orig_transform_224)
-
-        
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'mvtec-high-var':
         n_classes = 2
         train_dataset = []
