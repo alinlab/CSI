@@ -579,6 +579,25 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
+    elif dataset == 'dtd':
+        # image_size = (32, 32, 3)
+        n_classes = 10
+        test_transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+        train_transform = transforms.Compose([
+            transforms.Resize((image_size[0], image_size[1])),
+            transforms.ToTensor(),
+        ])
+        if train_transform_cutpasted:
+            train_set = datasets.DTD('./data', split="train", download=True, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.DTD('./data', split="train", download=True, transform=train_transform)
+        test_set = datasets.DTD('./data', split="test", download=True, transform=test_transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+
     elif dataset == 'cifar100':
         # image_size = (32, 32, 3)
         n_classes = 100
