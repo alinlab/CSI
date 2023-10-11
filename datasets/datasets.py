@@ -40,6 +40,7 @@ CIFAR100_SUPERCLASS = list(range(20))
 UCSD_SUPERCLASS = list(range(2))
 CIFAR10_CORRUPTION_SUPERCLASS = list(range(10))
 DTD_SUPERCLASS = list(range(46))
+WBC_SUPERCLASS = list(range(2))
 
 def sparse2coarse(targets):
     coarse_labels = np.array(
@@ -813,6 +814,8 @@ def get_superclass_list(dataset):
         return CIFAR10_CORRUPTION_SUPERCLASS
     elif dataset == 'dtd':
         return DTD_SUPERCLASS
+    elif dataset == "WBC":
+        return WBC_SUPERCLASS
     elif dataset == 'breastmnist':
         return breastmnist_SUPERCLASS
     elif dataset == 'Tomor_Detection':
