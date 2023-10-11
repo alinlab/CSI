@@ -594,7 +594,10 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.Resize([image_size[0], image_size[1]]) ,transforms.RandomHorizontalFlip()
         ])
         test_set = MyDataset_Binary(test_set__t, test_label, orig_transform_224)
-        train_set = MyDataset_Binary(Normal_data, Normal_label, orig_transform_224)
+        if train_transform_cutpasted:
+            train_set = MyDataset_Binary(Normal_data, Normal_label, train_transform_cutpasted)        
+        else:
+            train_set = MyDataset_Binary(Normal_data, Normal_label, orig_transform_224)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'mvtec-high-var':
