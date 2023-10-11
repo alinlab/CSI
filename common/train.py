@@ -64,7 +64,7 @@ print("full test set:", len(test_set))
 print("full train set:", len(train_set))
 
 full_test_set = deepcopy(test_set)  # test set of full classes
-if P.dataset=='mvtec-high-var' or P.dataset=="MVTecAD":
+if P.dataset=='mvtec-high-var' or P.dataset=="MVTecAD" or P.dataset=="WBC":
     train_set = set_dataset_count(train_set, count=P.main_count)
     test_set = get_subclass_dataset(P, test_set, classes=[0])
 else:
