@@ -147,13 +147,13 @@ class CutPaste3Way(object):
 class High_CutPasteUnion(object):
     def __init__(self, **kwags):
       kwags1={
-        "width":[20,30],
-        "height":[20,35],
+        "width":[50,80],
+        "height":[50,80],
         "transform": transforms.Compose([transforms.ToTensor(),])  
       }
       kwags2={
-        "area_ratio":[0.1,0.2],
-        "aspect_ratio":0.4, 
+        "area_ratio":[0.4,0.6],
+        "aspect_ratio":0.6, 
         "transform": transforms.Compose([transforms.ToTensor(),])  
       }
       self.scar = CutPasteScar(**kwags1)
