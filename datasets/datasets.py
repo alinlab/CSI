@@ -5,6 +5,7 @@ import torch
 from torch.utils.data.dataset import Subset
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
+from torchvision.datasets import ImageFolder
 
 from utils.utils import set_random_seed
 from datasets.cutpast_transformation import *
