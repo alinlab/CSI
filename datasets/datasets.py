@@ -529,7 +529,66 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             train_set = get_breastmnist_train(anomaly_class_indx=P.one_class_idx, path='./data/', transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
-    
+    elif dataset == 'WBC':
+        data_path_good_train ="./CELL_MIR"
+        orig_transform = transforms.Compose([
+                    transforms.Resize([image_size[0], image_size[1]]),transforms.RandomHorizontalFlip(), 
+                    transforms.ToTensor()
+                ])
+        dataset_train_good = ImageFolder(root=data_path_good_train, transform=orig_transform)
+        CELL_train_loader = torch.utils.data.DataLoader(
+                dataset_train_good,
+                batch_size=4,
+                shuffle=False,
+            )
+        training_cell = []
+        for  x in CELL_train_loader:
+            training_cell.append(x[0])
+        training_cell = torch.cat(training_cell)
+
+        import pandas as pd
+        df=pd.read_csv("./segmentation_WBC/Class Labels of Dataset 1.csv")
+        rows = []
+        for row in df['class label']:
+                rows.append(row)
+        images1=[]
+        images2=[]
+        images3=[]
+        images4=[]
+        index=[0,0,0,0,0,0]
+        for i in range(300):
+            if rows[i]==1:images1.append(training_cell[i])
+            if rows[i]==2:images2.append(training_cell[i])
+            if rows[i]==3:images3.append(training_cell[i])
+            if rows[i]==4:images4.append(training_cell[i])
+
+        images1=torch.stack(images1)
+        images2=torch.stack(images2)
+        images3=torch.stack(images3)
+        images4=torch.stack(images4)
+
+        np.random.shuffle(images1.numpy())
+        np.random.shuffle(images2.numpy())
+        np.random.shuffle(images3.numpy())
+        np.random.shuffle(images4.numpy())
+
+        Normal_data=images1[:int(images1.shape[0]*0.8)]  #Normal 1 
+        Normal_label=[0]*int(images1.shape[0]*0.8)
+
+        test_set_=[images1[int(images1.shape[0]*0.8):],images2 ,images3 ,images4 ]
+        test_label=[0]*(images1.shape[0]-int(images1.shape[0]*0.8))+ [1]*(images2.shape[0] )+[1]*(images3.shape[0] )+[1]*(images4.shape[0] )
+        test_set__t=torch.cat(test_set_)
+
+        orig_transform_224 = transforms.Compose([
+            transforms.Resize([image_size[0], image_size[1]]) 
+        ])
+        _transform_224 = transforms.Compose([
+            transforms.Resize([image_size[0], image_size[1]]) ,transforms.RandomHorizontalFlip()
+        ])
+        test_dataset = MyDataset_Binary(test_set__t, test_label, orig_transform_224)
+        train_dataset = MyDataset_Binary(Normal_data, Normal_label, orig_transform_224)
+
+        
     elif dataset == 'mvtec-high-var':
         n_classes = 2
         train_dataset = []

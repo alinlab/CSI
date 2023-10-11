@@ -705,3 +705,28 @@ class CIFAR_CORRUCPION(Dataset):
     
     def __len__(self):
         return len(self.data)
+
+
+class MyDataset_Binary(torch.utils.data.Dataset):
+  'Characterizes a dataset for PyTorch'
+  def __init__(self, x, labels,transform=None):
+        'Initialization'
+        super(MyDataset_Binary, self).__init__()
+        self.labels = labels
+        self.x = x
+        self.transform = transform
+
+  def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.x)
+
+  def __getitem__(self, index):
+        'Generates one sample of data'
+        if self.transform is None:
+          x =  self.x[index]
+          y = self.labels[index]
+        else:
+          x = self.transform(self.x[index])
+          y = self.labels[index]
+       
+        return x, y
