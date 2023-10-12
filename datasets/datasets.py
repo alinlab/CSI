@@ -518,7 +518,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         anomaly_testset = datasets.CIFAR100('./data', train=False, download=True, transform=transform)
         for i in range(len(anomaly_testset)):
             anomaly_testset.targets[i] = 1
-        normal_testset = datasets.CIFAR10(path, train=False, download=True, transform=transform)
+        normal_testset = datasets.CIFAR10('./data', train=False, download=True, transform=transform)
         for i in range(len(normal_testset)):
             normal_testset.targets[i] = 0
         test_set = torch.utils.data.ConcatDataset([anomaly_testset, normal_testset]) 
