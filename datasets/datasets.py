@@ -508,14 +508,14 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
             transforms.ToTensor(),
         ])
         if train_transform_cutpasted:
-            train_set = datasets.CIFAR10(path, train=True, download=True, transform=train_transform_cutpasted)
+            train_set = datasets.CIFAR10('./data', train=True, download=True, transform=train_transform_cutpasted)
         else:
-            train_set = datasets.CIFAR10(path, train=True, download=True, transform=transform)
+            train_set = datasets.CIFAR10('./data', train=True, download=True, transform=transform)
 
         for i in range(len(train_set)):
             train_set.targets[i] = 0
         
-        anomaly_testset = datasets.CIFAR100(path, train=False, download=True, transform=transform)
+        anomaly_testset = datasets.CIFAR100('./data', train=False, download=True, transform=transform)
         for i in range(len(anomaly_testset)):
             anomaly_testset.targets[i] = 1
         normal_testset = datasets.CIFAR10(path, train=False, download=True, transform=transform)
