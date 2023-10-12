@@ -726,7 +726,8 @@ class MyDataset_Binary(torch.utils.data.Dataset):
           x =  self.x[index]
           y = self.labels[index]
         else:
-          x = self.transform(self.x[index])
+          x = Image.fromarray((np.array(self.x[index]).transpose(1, 2, 0) * 255).astype(np.uint8))
+          x = self.transform(x)
           y = self.labels[index]
        
         return x, y

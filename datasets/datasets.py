@@ -252,16 +252,17 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.RandomRotation((90, 270)),
                 CutPasteNormal(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
-        #elif P.dataset=='WBC':
-        #    train_transform_cutpasted = transforms.Compose([
-        #        transforms.Resize((image_size[0], image_size[1])),
-        #        High_CutPasteUnion(),
-        #    ])
+            # elif P.dataset=='WBC':
+            #     train_transform_cutpasted = transforms.Compose([
+            #         transforms.Resize((image_size[0], image_size[1])),
+            #         High_CutPasteUnion(),
+            #     ])
         else:
             train_transform_cutpasted = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 CutPasteUnion(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
+        
         cutpast_train_set, _, _, _ = get_dataset(P, dataset=P.dataset, download=True, image_size=image_size, train_transform_cutpasted=train_transform_cutpasted)
         print("len(cutpast_train_set) before set_count: ", len(cutpast_train_set))
         if P.dataset=='head-ct' or P.dataset=='mvtec-high-var' or P.dataset=='ucsd' or P.dataset=='WBC':
