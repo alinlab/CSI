@@ -40,6 +40,7 @@ breastmnist_SUPERCLASS = list(range(2))
 CIFAR100_SUPERCLASS = list(range(20))
 UCSD_SUPERCLASS = list(range(2))
 CIFAR10_CORRUPTION_SUPERCLASS = list(range(10))
+CIFAR10_VER_CIFAR100_SUPERCLASS = list(range(2))
 DTD_SUPERCLASS = list(range(46))
 WBC_SUPERCLASS = list(range(2))
 
@@ -329,7 +330,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_cifar10_fake) > 0:
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
-            
+
         elif P.dataset=="cifar100":
             fake_transform = transforms.Compose([
                 transforms.Resize((image_size[0],image_size[1])),
@@ -861,6 +862,8 @@ def get_superclass_list(dataset):
         return SVHN_SUPERCLASS
     elif dataset == 'cifar10-corruption':
         return CIFAR10_CORRUPTION_SUPERCLASS
+    elif dataset == 'cifar10-versus-100':
+        return CIFAR10_VER_CIFAR100_SUPERCLASS
     elif dataset == 'dtd':
         return DTD_SUPERCLASS
     elif dataset == "WBC":
