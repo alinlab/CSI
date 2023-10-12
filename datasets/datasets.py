@@ -504,6 +504,12 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         print("test_set shapes: ", test_set[0][0].shape)
     elif dataset == 'cifar10-versus-100':
         n_classes = 2
+        train_transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+        ])
+
         transform = transforms.Compose([
             transforms.Resize((32, 32)),
             transforms.ToTensor(),
@@ -511,7 +517,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         if train_transform_cutpasted:
             train_set = datasets.CIFAR10('./data', train=True, download=True, transform=train_transform_cutpasted)
         else:
-            train_set = datasets.CIFAR10('./data', train=True, download=True, transform=transform)
+            train_set = datasets.CIFAR10('./data', train=True, download=True, transform=train_transform)
 
         for i in range(len(train_set)):
             train_set.targets[i] = 0
