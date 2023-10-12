@@ -253,7 +253,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.RandomRotation((90, 270)),
                 CutPasteNormal(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
-        elif P.dataset=='WBC':
+        elif P.dataset=='WBC' or P.dataset=='cifar10-versus-100':
             train_transform_cutpasted = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 High_CutPasteUnion(),
