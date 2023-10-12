@@ -64,7 +64,10 @@ print("full test set:", len(test_set))
 print("full train set:", len(train_set))
 
 full_test_set = deepcopy(test_set)  # test set of full classes
-if P.dataset=='mvtec-high-var' or P.dataset=="MVTecAD" or P.dataset=="WBC":
+
+
+
+if P.dataset=='mvtec-high-var' or P.dataset=="MVTecAD" or P.dataset=="WBC" or P.dataset=='cifar10-versus-100':
     train_set = set_dataset_count(train_set, count=P.main_count)
     test_set = get_subclass_dataset(P, test_set, classes=[0])
 else:
@@ -86,7 +89,7 @@ print("Unique labels(test_loader):", get_loader_unique_label(test_loader))
 print("Unique labels(train_loader):", get_loader_unique_label(train_loader))
 
 P.ood_dataset = anomaly_labels
-if P.dataset=="MVTecAD" or P.dataset=="mvtec-high-var":
+if P.dataset=="MVTecAD" or P.dataset=="mvtec-high-var" or P.dataset=='cifar10-versus-100':
     P.ood_dataset = [1]
 print("P.ood_dataset",  P.ood_dataset)
 
