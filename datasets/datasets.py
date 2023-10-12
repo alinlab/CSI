@@ -153,17 +153,19 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.AutoAugment(),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
-        ]) 
-    elif dataset == 'cifar10-versus-100':
-         tiny_transform = transforms.Compose([
-                transforms.Resize((image_size[0], image_size[1])),
-                transforms.RandomChoice(
-                    [transforms.RandomApply([transforms.RandomAffine(90, translate=(0.15, 0.15), scale=(0.85, 1), shear=None)], p=0.6),
-                        transforms.RandomApply([transforms.RandomAffine(0, translate=None, scale=(0.5, 0.75), shear=30)], p=0.6),
-                        transforms.RandomApply([transforms.AutoAugment()], p=0.9),]),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor()
         ])
+        '''
+        elif dataset == 'cifar10-versus-100' or dataset == 'cifar100-versus-10':
+            tiny_transform = transforms.Compose([
+                    transforms.Resize((image_size[0], image_size[1])),
+                    transforms.RandomChoice(
+                        [transforms.RandomApply([transforms.RandomAffine(90, translate=(0.15, 0.15), scale=(0.85, 1), shear=None)], p=0.6),
+                            transforms.RandomApply([transforms.RandomAffine(0, translate=None, scale=(0.5, 0.75), shear=30)], p=0.6),
+                            transforms.RandomApply([transforms.AutoAugment()], p=0.9),]),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor()
+            ])
+        '''
     else:
         tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
@@ -263,7 +265,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.RandomRotation((90, 270)),
                 CutPasteNormal(transform = transforms.Compose([transforms.ToTensor(),])),
             ])
-        elif P.dataset=='WBC' or P.dataset=='cifar10-versus-100':
+        elif P.dataset=='WBC' or P.dataset=='cifar10-versus-100' or P.dataset=='cifar100-versus-10':
             train_transform_cutpasted = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 High_CutPasteUnion(),
@@ -340,6 +342,22 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
             if len(train_ds_cifar10_fake) > 0:
                 print("number of fake data:", len(train_ds_cifar10_fake), "shape:", train_ds_cifar10_fake[0][0].shape)
             exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar10_fake, imagenet_exposure])
+        
+        elif P.dataset=="cifar100-versus-10":
+            cls_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+            fake_transform = transforms.Compose([
+                transforms.Resize((image_size[0],image_size[1])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()
+            ])
+            fake_root='./'
+            fc = [int(fake_count / len(cls_list)) for i in range(len(cls_list))]
+            if sum(fc) != fake_count:
+                fc[0] += abs(fake_count - sum(fc))
+            train_ds_cifar100_fake = FakeCIFAR100(root=fake_root, category=cls_list, transform=fake_transform, count=fc)
+            if len(train_ds_cifar100_fake) > 0:
+                print("number of fake data:", len(train_ds_cifar100_fake), "shape:", train_ds_cifar100_fake[0][0].shape)
+            exposureset = torch.utils.data.ConcatDataset([cutpast_train_set, train_ds_cifar100_fake, imagenet_exposure])
 
         elif P.dataset=="cifar100":
             fake_transform = transforms.Compose([
@@ -536,6 +554,35 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         for i in range(len(anomaly_testset)):
             anomaly_testset.targets[i] = 1
         normal_testset = datasets.CIFAR10('./data', train=False, download=True, transform=transform)
+        for i in range(len(normal_testset)):
+            normal_testset.targets[i] = 0
+        test_set = torch.utils.data.ConcatDataset([anomaly_testset, normal_testset]) 
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+    elif dataset == 'cifar100-versus-10':
+        n_classes = 2
+        train_transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+        ])
+
+        transform = transforms.Compose([
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+        ])
+        if train_transform_cutpasted:
+            train_set = datasets.CIFAR100('./data', train=True, download=True, transform=train_transform_cutpasted)
+        else:
+            train_set = datasets.CIFAR100('./data', train=True, download=True, transform=train_transform)
+
+        for i in range(len(train_set)):
+            train_set.targets[i] = 0
+        
+        anomaly_testset = datasets.CIFAR10('./data', train=False, download=True, transform=transform)
+        for i in range(len(anomaly_testset)):
+            anomaly_testset.targets[i] = 1
+        normal_testset = datasets.CIFAR100('./data', train=False, download=True, transform=transform)
         for i in range(len(normal_testset)):
             normal_testset.targets[i] = 0
         test_set = torch.utils.data.ConcatDataset([anomaly_testset, normal_testset]) 
@@ -880,6 +927,8 @@ def get_superclass_list(dataset):
     elif dataset == 'cifar10-corruption':
         return CIFAR10_CORRUPTION_SUPERCLASS
     elif dataset == 'cifar10-versus-100':
+        return CIFAR10_VER_CIFAR100_SUPERCLASS
+    elif dataset == 'cifar100-versus-10':
         return CIFAR10_VER_CIFAR100_SUPERCLASS
     elif dataset == 'dtd':
         return DTD_SUPERCLASS
