@@ -154,7 +154,7 @@ def get_exposure_dataloader(P, batch_size = 64, image_size=(224, 224, 3),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
         ])
-    elif dataset == 'cifar10-versus-100' or dataset == 'cifar100-versus-10':
+    elif P.dataset == 'cifar10-versus-100' or P.dataset == 'cifar100-versus-10':
         tiny_transform = transforms.Compose([
                 transforms.Resize((image_size[0], image_size[1])),
                 transforms.RandomChoice(
