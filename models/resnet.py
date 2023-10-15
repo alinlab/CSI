@@ -250,7 +250,8 @@ class Pretrain_ResNet152_Corruption(BaseModel):
 
         self.in_planes = 64
         self.last_dim = last_dim
-
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        
         mu = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1).cuda()
         std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1).cuda()
         self.norm = lambda x: (x - mu) / std
