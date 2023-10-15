@@ -66,6 +66,8 @@ def get_classifier(mode, n_classes=10):
         classifier = VIT_Pretrain_FITYMI(num_classes=n_classes)
     elif mode == "vit":
         classifier = VIT_Pretrain(num_classes=n_classes)
+    elif mode == 'pretrain-resnet152-corruption':
+        classifier = Pretrain_ResNet152_Corruption_Model(num_classes=n_classes)
     elif mode =='pretrain-resnet152':
         classifier = Pretrain_ResNet152_Model(num_classes=n_classes)
     elif mode =='pretrain-resnet18':
