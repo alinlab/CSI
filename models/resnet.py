@@ -14,7 +14,6 @@ from models.base_model import BaseModel
 from models.transform_layers import NormalizeLayer
 from torch.nn.utils import spectral_norm
 from torchvision import models
-from robustbench.utils import load_model
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
@@ -247,6 +246,7 @@ class Pretrain_ResNet152_Corruption(BaseModel):
     def __init__(self, block, num_blocks, num_classes=10):
         last_dim = 2048 * block.expansion
         super(Pretrain_ResNet152_Corruption, self).__init__(last_dim, num_classes)
+        from robustbench.utils import load_model
 
         self.in_planes = 64
         self.last_dim = last_dim
@@ -281,7 +281,7 @@ def ResNet50(num_classes):
     return ResNet(Bottleneck, [3,4,6,3], num_classes=num_classes)
 
 def Pretrain_ResNet18_Model(num_classes):
-    return Pretrain_ResNet(BasicBlock, [2,2,2,2], num_classes=num_classes)
+    return Pretrain_ResNet(BasicBlock, [2,2,2,2],   num_classes=num_classes)
 
 def Pretrain_ResNet152_Model(num_classes):
     return Pretrain_ResNet152(BasicBlock, [2,2,2,2], num_classes=num_classes)
