@@ -241,6 +241,34 @@ class Pretrain_ResNet152(BaseModel):
         z_n = F.normalize(z1, dim=-1)
         return z_n
 
+
+class Pretrain_ResNet152_Corruption(BaseModel):
+    def __init__(self, block, num_blocks, num_classes=10):
+        last_dim = 2048 * block.expansion
+        super(Pretrain_ResNet152, self).__init__(last_dim, num_classes)
+
+        self.in_planes = 64
+        self.last_dim = last_dim
+
+        mu = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1).cuda()
+        std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1).cuda()
+        self.norm = lambda x: (x - mu) / std
+        self.backbone = load_model('Hendrycks2020Many', dataset='imagenet', threat_model='corruptions').to(device)
+        self.backbone.model.fc = torch.nn.Identity()
+        i = 0
+        num = 108
+        for param in self.backbone.parameters():
+            if i<num:
+                param.requires_grad = False
+            i+=1
+
+    def penultimate(self, x, all_features=False):
+        x = self.norm(x)
+        z1 = self.backbone(x)
+        z_n = F.normalize(z1, dim=-1)
+        return z_n
+
+
 def ResNet18(num_classes):
     return ResNet(BasicBlock, [2,2,2,2], num_classes=num_classes)
 
@@ -255,3 +283,6 @@ def Pretrain_ResNet18_Model(num_classes):
 
 def Pretrain_ResNet152_Model(num_classes):
     return Pretrain_ResNet152(BasicBlock, [2,2,2,2], num_classes=num_classes)
+
+def Pretrain_ResNet152_Corruption_Model(num_classes):
+    return Pretrain_ResNet152_Corruption(BasicBlock, [2,2,2,2], num_classes=num_classes)
