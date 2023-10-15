@@ -14,6 +14,7 @@ from models.base_model import BaseModel
 from models.transform_layers import NormalizeLayer
 from torch.nn.utils import spectral_norm
 from torchvision import models
+from robustbench.utils import load_model
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
