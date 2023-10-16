@@ -37,10 +37,10 @@ class BasicBlock(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.gelu(self.bn1(self.conv1(x)))
         out = self.bn2(self.conv2(out))
         out += self.shortcut(x)
-        out = F.relu(out)
+        out = F.gelu(out)
         return out
 
 
@@ -62,10 +62,10 @@ class PreActBlock(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.bn1(x))
+        out = F.gelu(self.bn1(x))
         shortcut = self.shortcut(out)
         out = self.conv1(out)
-        out = self.conv2(F.relu(self.bn2(out)))
+        out = self.conv2(F.gelu(self.bn2(out)))
         out += shortcut
         return out
 
@@ -90,11 +90,11 @@ class Bottleneck(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = F.relu(self.bn2(self.conv2(out)))
+        out = F.gelu(self.bn1(self.conv1(x)))
+        out = F.gelu(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
         out += self.shortcut(x)
-        out = F.relu(out)
+        out = F.gelu(out)
         return out
 
 
@@ -118,11 +118,11 @@ class PreActBottleneck(nn.Module):
             )
 
     def forward(self, x):
-        out = F.relu(self.bn1(x))
+        out = F.gelu(self.bn1(x))
         shortcut = self.shortcut(out)
         out = self.conv1(out)
-        out = self.conv2(F.relu(self.bn2(out)))
-        out = self.conv3(F.relu(self.bn3(out)))
+        out = self.conv2(F.gelu(self.bn2(out)))
+        out = self.conv3(F.gelu(self.bn3(out)))
         out += shortcut
         return out
 
@@ -159,7 +159,7 @@ class ResNet(BaseModel):
         out = self.normalize(x)
         out = self.conv1(out)
         out = self.bn1(out)
-        out = F.relu(out)
+        out = F.gelu(out)
         out_list.append(out)
 
         out = self.layer1(out)
