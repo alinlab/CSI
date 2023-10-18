@@ -9,6 +9,7 @@ if 'sup' in P.mode:
     from training.sup import setup
 else:
     from training.unsup import setup
+    
 train, fname = setup(P.mode, P)
 
 logger = Logger(fname, ask=not resume, local_rank=P.local_rank)
