@@ -40,6 +40,7 @@ breastmnist_SUPERCLASS = list(range(2))
 CIFAR100_SUPERCLASS = list(range(20))
 UCSD_SUPERCLASS = list(range(2))
 CIFAR10_CORRUPTION_SUPERCLASS = list(range(10))
+MNIST_CORRUPTION_SUPERCLASS = list(range(10))
 CIFAR10_VER_CIFAR100_SUPERCLASS = list(range(2))
 DTD_SUPERCLASS = list(range(46))
 WBC_SUPERCLASS = list(range(2))
@@ -814,6 +815,19 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
+    
+    elif dataset=='mnist-corruption':
+        n_classes = 10
+        transform = transforms.Compose([
+                transforms.Resize(32),
+                transforms.Grayscale(num_output_channels=3),
+                transforms.ToTensor(),
+        ])
+        test_set = MNIST_CORRUCPION(root_dir=P.mnist_corruption_folder, corruption_type=P.mnist_corruption_type, transform=transform, train=False)
+        train_set = datasets.MNIST(DATA_PATH, train=True, download=True, transform=transform)
+        print("train_set shapes: ", train_set[0][0].shape)
+        print("test_set shapes: ", test_set[0][0].shape)
+        
     elif dataset == 'svhn-10':
         # image_size = (32, 32, 3)
         n_classes = 10
@@ -924,6 +938,8 @@ def get_superclass_list(dataset):
         return SVHN_SUPERCLASS
     elif dataset == 'cifar10-corruption':
         return CIFAR10_CORRUPTION_SUPERCLASS
+    elif dataset == 'mnist-corruption':
+        return MNIST_CORRUPTION_SUPERCLASS
     elif dataset == 'cifar10-versus-100':
         return CIFAR10_VER_CIFAR100_SUPERCLASS
     elif dataset == 'cifar100-versus-10':

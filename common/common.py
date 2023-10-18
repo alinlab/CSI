@@ -7,12 +7,35 @@ def parse_args(default=False):
     parser = ArgumentParser(description='Pytorch implementation of CSI')
 
     parser.add_argument('--dataset', help='Dataset',
-                        choices=['cifar100-versus-10', 'cifar10-versus-100', 'WBC', 'dtd', 'cifar10-corruption', 'Tomor_Detection', 'ucsd', 'mvtec-high-var', 'breastmnist', 'head-ct', 'fashion-mnist', 'mnist', 'cifar10', 'cifar100', 'imagenet', 'svhn-10', 'MVTecAD'],
+                        choices=['cifar100-versus-10', 'cifar10-versus-100', 'WBC', 'dtd', 'cifar10-corruption', 'mnist-corruption', 'Tomor_Detection', 'ucsd', 'mvtec-high-var', 'breastmnist', 'head-ct', 'fashion-mnist', 'mnist', 'cifar10', 'cifar100', 'imagenet', 'svhn-10', 'MVTecAD'],
                         default="cifar10", type=str)
     parser.add_argument('--normal_labels', help='normal_labels for high variation',
                         default="0,1,2,3,4,5,6,7,8,9,10,11,12,13", type=str)
     parser.add_argument('--cifar_corruption_data', help='',
-                        default="./CIFAR-10-C/defocus_blur.npy", type=str)                    
+                        default="./CIFAR-10-C/defocus_blur.npy", type=str)
+    parser.add_argument('--mnist_corruption_folder', help='',
+                        default="./mnist_c/", type=str)
+    parser.add_argument('--mnist_corruption_type', help='MNIST corruption type',
+                        choices=[
+                            "brightness",
+                            "canny_edges",
+                            "dotted_line",
+                            "fog",
+                            "glass_blur",
+                            "identity",
+                            "impulse_noise",
+                            "motion_blur",
+                            "rotate",
+                            "scale",
+                            "shear",
+                            "shot_noise",
+                            "spatter",
+                            "stripe",
+                            "translate",
+                            "zigzag"
+                        ],
+                        default="brightness", type=str)
+                
     parser.add_argument('--one_class_idx', help='None: multi-class, Not None: one-class',
                         default=None, type=int)
     parser.add_argument('--unfreeze_pretrain_model_epoch', help='unfreeze_pretrain_model',

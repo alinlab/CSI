@@ -18,11 +18,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import cv2
-
+import torchvision
 import subprocess
 from tqdm import tqdm
 import requests
-
+import shutil 
+from PIL import Image
 import shutil
 import random
 import zipfile
@@ -706,7 +707,50 @@ class CIFAR_CORRUCPION(Dataset):
     def __len__(self):
         return len(self.data)
 
+class MNIST_CORRUPTION(Dataset):
+    def __init__(self, root_dir, corruption_type, transform=None, train=True):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.corruption_type = corruption_type
+        self.train = train
 
+        indicator = 'train' if train else 'test'
+        folder = os.path.join(self.root_dir, self.corruption_type, f'saved_{indicator}_images')
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+        os.makedirs(folder)
+        
+        if train:
+            data = np.load(os.path.join(root_dir, corruption_type, 'train_images.npy'))
+            labels = np.load(os.path.join(root_dir, corruption_type, 'train_labels.npy'))
+        else:
+            data = np.load(os.path.join(root_dir, corruption_type, 'test_images.npy'))
+            labels = np.load(os.path.join(root_dir, corruption_type, 'test_labels.npy'))
+            
+        self.labels = labels
+        self.image_paths = []
+
+        for idx, img in enumerate(data):
+            path = os.path.join(folder, f"{idx}.png")
+            self.image_paths.append(path)
+            
+            if not os.path.exists(path):
+                img_pil = torchvision.transforms.ToPILImage()(img)
+                img_pil.save(path)
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        image_path = self.image_paths[idx]
+        image = Image.open(image_path).convert("RGB") 
+
+        if self.transform:
+            image = self.transform(image)
+
+        label = self.labels[idx]
+        return image, label
+    
 class MyDataset_Binary(torch.utils.data.Dataset):
   'Characterizes a dataset for PyTorch'
   def __init__(self, x, labels,transform=None, cutpast_transformation=None):
