@@ -71,13 +71,13 @@ for epoch in range(start_epoch, P.epochs + 1):
 
         # Check the result
         if result.returncode == 0:
-            print("Script executed successfully.")
-            print("Output:")
-            print(result.stdout)
+            logger.log("Script executed successfully.")
+            logger.log("Output:")
+            logger.log(result.stdout)
         else:
-            print("Script execution failed.")
-            print("Error:")
-            print(result.stderr)
+            logger.log("Script execution failed.")
+            logger.log("Error:")
+            logger.log(result.stderr)
         
 epoch += 1
 if P.multi_gpu:
