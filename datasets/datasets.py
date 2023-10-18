@@ -823,7 +823,7 @@ def get_dataset(P, dataset, test_only=False, image_size=(32, 32, 3), download=Fa
                 transforms.Grayscale(num_output_channels=3),
                 transforms.ToTensor(),
         ])
-        test_set = MNIST_CORRUCPION(root_dir=P.mnist_corruption_folder, corruption_type=P.mnist_corruption_type, transform=transform, train=False)
+        test_set = MNIST_CORRUPTION(root_dir=P.mnist_corruption_folder, corruption_type=P.mnist_corruption_type, transform=transform, train=False)
         train_set = datasets.MNIST(DATA_PATH, train=True, download=True, transform=transform)
         print("train_set shapes: ", train_set[0][0].shape)
         print("test_set shapes: ", test_set[0][0].shape)
